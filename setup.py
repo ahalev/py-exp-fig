@@ -9,7 +9,7 @@ LICENSE = "MIT License"
 PROJECT_URLS = {}
 
 setup(
-    name="py-exp-config",
+    name="expfig",
     package_dir={"": "src"},
     packages=find_packages("src"),
     python_requires=">=3.6",
