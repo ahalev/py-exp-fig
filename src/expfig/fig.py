@@ -22,7 +22,7 @@ TODO here
 
 class Config(Namespacify):
     def __init__(self, config=None, keys_for_name=('algo', 'type'), name_prefix='', default=DEFAULT_CONFIG_PATH):
-        self.default_config = DefaultConfig(default).with_name_from_keys(*keys_for_name, prefix=name_prefix)
+        self.default_config = DefaultConfig(self._parse_default(config, default)).with_name_from_keys(*keys_for_name, prefix=name_prefix)
 
         super().__init__(self._parse_config())
 
@@ -31,6 +31,14 @@ class Config(Namespacify):
 
         self.with_name_from_keys(*keys_for_name, prefix=name_prefix)
         self._verbose(self.context.verbose)
+
+    def _parse_default(self, config, default):
+        if os.path.exists(default):
+            return default
+        elif config is not None and os.path.exists(config):
+            return config
+        else:
+            raise ValueError(f'Default config path {default} does not point to a file and {config} does not either.')
 
     def _verbose(self, level):
         if level >= 2:
