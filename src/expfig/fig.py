@@ -140,7 +140,7 @@ def _config_from_yaml(file_path):
     loaded_contents = yaml.safe_load(contents)
 
     if not isinstance(loaded_contents, dict):
-        raise ValueError(f'Contents of file "{file_path}" deserialize into object of type {type(loaded_contents)},'
-                         f'not dict.')
+        raise ValueError(f'Contents of file "{file_path}" deserialize into object of type '
+                         f'{type(loaded_contents).__name__}, should be dict.')
 
     return loaded_contents
