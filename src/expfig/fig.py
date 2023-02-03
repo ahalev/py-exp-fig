@@ -13,12 +13,6 @@ from . import Namespacify, nested_dict_update
 
 DEFAULT_CONFIG_PATH = os.path.join(os.getcwd(), 'default_config.yaml')
 
-"""
-TODO here
-1) add the keys and the prefix to get the names from in the signature
-2) Is there a way to read a global variable in a project to set the default config path?
-"""
-
 
 class Config(Namespacify):
     def __init__(self, config=None, keys_for_name=('algo', 'type'), name_prefix='', default=DEFAULT_CONFIG_PATH):
