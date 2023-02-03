@@ -24,7 +24,7 @@ class Config(Namespacify):
             self._update_with_config(config)
 
         self.with_name_from_keys(*keys_for_name, prefix=name_prefix)
-        self._verbose(self.context.verbose)
+        self._verbose()
 
     def _parse_default(self, config, default):
         if os.path.exists(default):
@@ -34,7 +34,13 @@ class Config(Namespacify):
         else:
             raise ValueError(f'Default config path {default} does not point to a file and {config} does not either.')
 
-    def _verbose(self, level):
+    def _verbose(self, level='from_config'):
+        if level == 'from_config':
+            try:
+                level = self.context.verbose
+            except AttributeError:
+                level = 0
+
         if level >= 2:
             print('Trainer config:')
             self.pprint(indent=1)
