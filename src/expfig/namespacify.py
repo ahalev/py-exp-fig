@@ -8,6 +8,8 @@ class Namespacify(UserDict):
         self.name = name
 
         for key in in_dict.keys():
+            if key == 'name':
+                raise NameError(f"Cannot use key 'name'.")
             if isinstance(in_dict[key], dict):
                 in_dict[key] = Namespacify(in_dict[key], name=key)
 
