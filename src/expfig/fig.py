@@ -137,4 +137,9 @@ class DefaultConfig(Namespacify):
 
     def _load_default_config(self, file_path):
         contents = Path(file_path).open('r')
-        return yaml.safe_load(contents)
+        loaded_contents = yaml.safe_load(contents)
+
+        if not isinstance(loaded_contents, dict):
+            raise ValueError('Contents of file do not deserialize into a dict.')
+
+        return loaded_contents
