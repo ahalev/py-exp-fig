@@ -44,8 +44,7 @@ class Config(Namespacify):
 
     def _update_with_config(self, config, updatee=None):
         if isinstance(config, str):
-            with open(config, 'r') as f:
-                config = yaml.safe_load(f)
+            config = _config_from_yaml(config)
 
         if updatee:
             nested_dict_update(updatee, config)
@@ -133,8 +132,14 @@ class Config(Namespacify):
 
 class DefaultConfig(Namespacify):
     def __init__(self, file_path):
-        super().__init__(self._load_default_config(file_path))
+        super().__init__(_config_from_yaml(file_path))
 
-    def _load_default_config(self, file_path):
-        contents = Path(file_path).open('r')
-        return yaml.safe_load(contents)
+
+def _config_from_yaml(file_path):
+    contents = Path(file_path).open('r')
+    loaded_contents = yaml.safe_load(contents)
+
+    if not isinstance(loaded_contents, dict):
+        raise ValueError(f'Contents of file ({file_path}) do not deserialize into a dict.')
+
+    return loaded_contents
