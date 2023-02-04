@@ -1,7 +1,7 @@
 import os
 
 
-def make_sequential_log_dir(log_dir):
+def make_sequential_log_dir(log_dir, use_existing_dir=False):
     """Taken from rlworkgroup/garage.
 
     Creates log_dir, appending a number if necessary.
@@ -11,6 +11,7 @@ def make_sequential_log_dir(log_dir):
 
     Args:
         log_dir (str): The log directory to attempt to create.
+        use_existing_dir (bool): whether to simply return the dir if it exists (will log to existing dir).
 
     Returns:
         str: The log directory actually created.
@@ -27,4 +28,7 @@ def make_sequential_log_dir(log_dir):
                 log_dir = possible_log_dir
             return log_dir
         except FileExistsError:
+            if use_existing_dir:
+                return log_dir
+
             i += 1
