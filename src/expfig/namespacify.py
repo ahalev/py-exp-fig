@@ -46,10 +46,12 @@ class Namespacify(UserDict):
             else:
                 print("{}{}: {}".format(' ' * indent, k, v))
 
+    def to_dict(self):
+        return self.data.copy()
+
     def serialize(self, stream=None):
         yaml.SafeDumper.add_multi_representer(UserDict, yaml.SafeDumper.represent_dict)
         return yaml.safe_dump(self, stream=stream)
-
 
     @classmethod
     def deserialize(cls, stream):
