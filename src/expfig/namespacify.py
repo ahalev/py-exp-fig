@@ -81,13 +81,22 @@ class Namespacify(UserDict):
 
     def __xor__(self, other):
         diff = {}
-        for k, v in self.items():
-            assert k in other
-            if v != other[k]:
-                if isinstance(v, Namespacify):
-                    diff[k] = v.__xor__(other[k])
+
+        keys = {*self.keys(), *other.keys()}
+        for k in keys:
+            if k not in self:
+                diff[k] = other[k]
+                continue
+
+            elif k not in other:
+                diff[k] = self[k]
+                continue
+
+            elif self[k] != other[k]:
+                if isinstance(self[k], Namespacify):
+                    diff[k] = self[k].__xor__(other[k])
                 else:
-                    diff[k] = v
+                    diff[k] = self[k]
 
         return Namespacify(diff, name=self.name)
 
