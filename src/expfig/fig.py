@@ -90,11 +90,12 @@ class Config(Namespacify):
             valid_args = "\n\t\t".join(sorted(parsed_args[0].__dict__.keys()))
             warn(f'Unrecognized arguments {bad_args}.\n\tValid arguments:\n\t\t{valid_args}')
 
-        config_file = parsed_args[0].__dict__.pop('config')
+        config_files = parsed_args[0].__dict__.pop('config')
         restructured = self._restructure_arguments(parsed_args[0].__dict__)
 
-        if config_file is not None:
-            self._update_with_config(config_file, updatee=restructured)
+        if config_files is not None:
+            for config_file in config_files:
+                self._update_with_config(config_file, updatee=restructured)
 
         self._check_restructured(restructured, self.default_config)
         return restructured
@@ -104,7 +105,7 @@ class Config(Namespacify):
         for arg_name, arg_info in self._get_arguments().items():
             parser.add_argument(f'--{arg_name}', **arg_info)
 
-        parser.add_argument('--config', default=None)
+        parser.add_argument('--config', default=None, nargs='+')
 
         return parser
 
