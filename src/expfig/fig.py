@@ -52,10 +52,21 @@ class Config(Namespacify):
         if isinstance(config, str):
             config = _config_from_yaml(config)
 
+        config = self._restructure_as_necessary(config)
+
         if updatee:
             nested_dict_update(updatee, config)
         else:
             nested_dict_update(self, config)
+
+    def _restructure_as_necessary(self, config):
+        if any('.' in k for k in config.keys()):
+            if any(isinstance(v, dict) for v in config.values()):
+                raise ValueError('Cannot combine nested dict config arguments with "." deliminated arguments.')
+
+            config = self._restructure_arguments(config)
+
+        return config
 
     def _get_arguments(self, key='', d=None):
         if d is None:
