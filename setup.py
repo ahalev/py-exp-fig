@@ -7,6 +7,9 @@ MAINTAINER = "Avishai Halev"
 MAINTAINER_EMAIL = "avishaihalev@gmail.com"
 LICENSE = "MIT License"
 PROJECT_URLS = {}
+EXTRAS = {
+    "dev": ["pytest"]
+}
 
 setup(
     name="expfig",
@@ -26,4 +29,6 @@ setup(
         "pandas",
         "pyyaml"
     ],
+    extras_require=EXTRAS
+
 )
