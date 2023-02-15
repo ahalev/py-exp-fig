@@ -19,7 +19,7 @@ class Namespacify(UserDict):
 
         super().__init__(in_dict)
 
-    def with_name_from_keys(self, *keys, prefix='', suffix=''):
+    def with_name_from_keys(self, *keys, prefix='', suffix='', uppercase=True):
         obj = self
         for j, key in enumerate(keys):
             try:
@@ -30,7 +30,10 @@ class Namespacify(UserDict):
         if isinstance(obj, (dict, UserDict)):
             raise KeyError(f'Nested value {"->".join(keys)} is dict-like, should be str, int, etc.')
 
-        self.name = f'{prefix}{obj.upper()}{suffix}'
+        if uppercase:
+            obj = obj.upper()
+
+        self.name = f'{prefix}{obj}{suffix}'
 
         return self
 
