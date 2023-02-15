@@ -4,6 +4,8 @@ from collections import UserDict
 
 from .logger import make_sequential_log_dir
 
+yaml.SafeDumper.add_multi_representer(UserDict, yaml.SafeDumper.represent_dict)
+
 
 class Namespacify(UserDict):
     def __init__(self, in_dict, name=''):
@@ -52,7 +54,6 @@ class Namespacify(UserDict):
         return self.data.copy()
 
     def serialize(self, stream=None):
-        yaml.SafeDumper.add_multi_representer(UserDict, yaml.SafeDumper.represent_dict)
         return yaml.safe_dump(self, stream=stream)
 
     def serialize_to_dir(self, log_dir, use_existing_dir=False):
