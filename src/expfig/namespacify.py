@@ -54,7 +54,8 @@ class Namespacify(UserDict):
                 print("{}{}: {}".format(' ' * indent, k, v))
 
     def to_dict(self):
-        return self.data.copy()
+        return {k: v.to_dict() if isinstance(v, Namespacify) else (v.copy() if hasattr(v, 'copy') else v)
+                for k, v in self.items()}
 
     def serialize(self, stream=None):
         return yaml.safe_dump(self, stream=stream)
