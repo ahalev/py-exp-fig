@@ -24,7 +24,7 @@ class Namespacify(UserDict):
         for j, key in enumerate(keys):
             try:
                 obj = obj[key]
-            except KeyError:
+            except (KeyError, TypeError):
                 raise KeyError(f'Nested value {"->".join(keys[:j])} does not exist.')
 
         if isinstance(obj, (dict, UserDict)):
