@@ -22,18 +22,21 @@ class Namespacify(UserDict):
         super().__init__(in_dict)
 
     def with_name_from_keys(self, *keys, prefix='', suffix='', uppercase=True):
-        obj = self
-        for j, key in enumerate(keys):
-            try:
-                obj = obj[key]
-            except (KeyError, TypeError):
-                raise KeyError(f'Nested value {"->".join(keys[:j])} does not exist.')
+        if not keys:
+            obj = ''
+        else:
+            obj = self
+            for j, key in enumerate(keys):
+                try:
+                    obj = obj[key]
+                except (KeyError, TypeError):
+                    raise KeyError(f'Nested value {"->".join(keys[:j])} does not exist.')
 
-        if isinstance(obj, (dict, UserDict)):
-            raise KeyError(f'Nested value {"->".join(keys)} is dict-like, should be str, int, etc.')
+            if isinstance(obj, (dict, UserDict)):
+                raise KeyError(f'Nested value {"->".join(keys)} is dict-like, should be str, int, etc.')
 
-        if uppercase:
-            obj = obj.upper()
+            if uppercase:
+                obj = obj.upper()
 
         self.name = f'{prefix}{obj}{suffix}'
 
