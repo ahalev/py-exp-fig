@@ -66,10 +66,14 @@ class Namespacify(UserDict):
     def serialize(self, stream=None):
         return yaml.safe_dump(self, stream=stream)
 
-    def serialize_to_dir(self, log_dir, use_existing_dir=False):
+    def serialize_to_dir(self, log_dir, fname='namespacify.yaml', use_existing_dir=False):
         log_dir = make_sequential_log_dir(log_dir, use_existing_dir=use_existing_dir)
-        with open(log_dir, 'w') as f:
+        log_file = f'{log_dir}/{fname}'
+
+        with open(log_file, 'w') as f:
             self.serialize(f)
+
+        logger.info(f'Logged {type(self).__name__} to {log_file}')
 
         return log_dir
 
