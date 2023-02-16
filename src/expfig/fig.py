@@ -5,8 +5,8 @@ import pandas as pd
 import yaml
 
 
-from pathlib import Path
 from collections import UserDict
+from pathlib import Path
 from warnings import warn
 
 from . import Namespacify, nested_dict_update
