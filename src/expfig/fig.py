@@ -31,6 +31,23 @@ class Config(Namespacify):
         self.with_name_from_keys(*keys_for_name, prefix=name_prefix)
         self.verbose(self.verbosity)
 
+    def serialize_to_dir(self, log_dir, fname='config.yaml', use_existing_dir=False, with_default=False):
+        log_dir = super().serialize_to_dir(log_dir, fname=fname, use_existing_dir=use_existing_dir)
+
+        if with_default:
+            path = Path(fname)
+
+            def fname_func(kind): return (path.parent / f'{path.stem}_{kind}').with_suffix(path.suffix)
+
+            self.default_config.serialize_to_dir(log_dir,
+                                                 fname=fname_func('default'),
+                                                 use_existing_dir=True)
+
+            (self ^ self.default_config).serialize_to_dir(log_dir,
+                                                          fname=fname_func('difference'),
+                                                          use_existing_dir=True)
+        return log_dir
+
     def _parse_default(self, config, default):
         candidates = [Path(default), (Path(sys.argv[0]).parent / default)]
 
