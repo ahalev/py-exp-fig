@@ -48,11 +48,16 @@ class Config(Namespacify):
 
     def verbose(self, level):
         if level >= 2:
-            print('Trainer config:')
+            logger.info('Trainer config:')
             self.pprint(indent=1)
-        elif level >= 1:
-            print('Custom trainer config:')
-            (self ^ self.default_config).pprint(indent=1)
+        if level >= 1:
+            xor = self ^ self.default_config
+            print(f'\n{"-"*10}\n')
+            if xor:
+                logger.info('Custom trainer config (difference from default):')
+                xor.pprint(indent=1)
+            else:
+                logger.info('No difference from default.')
 
     def _update_with_config(self, config, updatee=None):
         if isinstance(config, str):
