@@ -1,0 +1,11 @@
+hyperparams:
+  n_neighbors: 5
+  weights: uniform
+  p: 2
+train_test_split:
+  test_size: 0.25
+logging:
+  log_dir: knn_example_logs
+  report_fname: report.csv
+context:
+  verbose: 2
