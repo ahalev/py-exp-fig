@@ -6,11 +6,13 @@ import yaml
 
 
 from collections import UserDict
+from logging import getLogger
 from pathlib import Path
 from warnings import warn
 
 from . import Namespacify, nested_dict_update
 
+logger = getLogger(__name__)
 
 DEFAULT_CONFIG_PATH = os.path.join(os.getcwd(), 'default_config.yaml')
 
