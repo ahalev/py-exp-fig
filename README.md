@@ -219,12 +219,14 @@ There are three other ways to define custom settings/hyperparameters:
      the above except it is done within a script and not at the command line:
      ```python
      from expfig import Config
-     config = Config(config='custom_config.yaml')
+     
+     config = Config(config='path_to_a_config.yaml')
      ```
   3. You can pass a nested dictionary defining configuration settings to `expfig.Config`.
      For example:
      ```python
      from expfig import Config
+     
      config_dict = {
          'microgrid': {'config': {'scenario': 1}},
          'algo': {'sampler': {'type': 'local', 'n_workers': 4}},
@@ -237,8 +239,5 @@ There are three other ways to define custom settings/hyperparameters:
 ## Additional Examples
 
 An example of using `expfig.Config` to set hyperparameters for a machine learning problem
-is available in `examples/knn`.
-
-This example demonstrates a simple class to run a classification problem using `scikit-learn`'s
+is available in `examples/knn`. This example demonstrates a simple class to run a classification problem using `scikit-learn`'s
 [`KNeighborsClassifier`](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html).
-difying `context.log_dir` and `context.experiment_name`. 
