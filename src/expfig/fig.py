@@ -101,8 +101,12 @@ class Config(Namespacify):
             valid_args = "\n\t\t".join(sorted(parsed_args[0].__dict__.keys()))
             warn(f'Unrecognized arguments {bad_args}.\n\tValid arguments:\n\t\t{valid_args}')
 
-        config_files = parsed_args[0].__dict__.pop('config')
-        restructured = self._restructure_arguments(parsed_args[0].__dict__)
+        args_dict = parsed_args[0].__dict__
+
+        config_files = args_dict.pop('config')
+
+        args_dict = self._extract_verbosity(args_dict)
+        restructured = self._restructure_arguments(args_dict)
 
         if config_files is not None:
             for config_file in config_files:
@@ -117,6 +121,9 @@ class Config(Namespacify):
             parser.add_argument(f'--{arg_name}', **arg_info)
 
         parser.add_argument('--config', default=None, nargs='+')
+
+        if parser.get_default('verbose') is None:
+            parser.add_argument('--verbose', default=0, type=int)
 
         return parser
 
