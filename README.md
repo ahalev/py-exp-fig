@@ -12,7 +12,7 @@ pip install experiment-config
 
 
 It reads hyperparameters from YAML files, the command line, and user inputs and makes them 
-available as both attributes and parameters. 
+available as both attributes and keys. 
 It can be embedded in both a script or a class.
 
 ## Quick Start
