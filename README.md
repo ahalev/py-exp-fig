@@ -149,7 +149,7 @@ config:
 The first block is the difference between the config and the default config, while the second is the pretty-print of
 the entire config.
 
-### Saving config files
+## Saving a `Config`
 
 `expfig.Config` takes advantage of YAML-serialization (and de-serialization) for 
 reproducibility.
@@ -169,13 +169,16 @@ with open('simple_serialization.yaml', 'w') as f:
 `expfig.Config.serialize_to_dir` will ensure that you are not overwriting any existing directories
 (if desired), and can also handle serializing the default config and the difference:
 ```python
+# python examples/quick_start/serialize_fizz_buzz.py
+
+
 from fizz_buzz import Solution
 
 # Serialize the underlying dict. Makes sure it does not overwrite any existing `fizz_buzz_config` directory
 # by appending an integer on the end if one exists.
 Solution().config.serialize_to_dir('fizz_buzz_configs')
 
-# Same as the above, but also serializes the default config and the difference.
+# Same as the above, but also serialize the default config and the difference.
 Solution().config.serialize_to_dir('fizz_buzz_configs_with_default', with_default=True)
 ```
 
@@ -191,7 +194,7 @@ with open('simple_serialization.yaml', 'r') as f:
 Note that doing so effectively treats `simple_serialization.yaml` as a default config;
 you can use command-line arguments to update it upon loading.
 
-### Additional methods of inputting custom hyperparameters
+## Additional methods of inputting custom hyperparameters
 
 There are three other ways to define custom settings/hyperparameters:
 
