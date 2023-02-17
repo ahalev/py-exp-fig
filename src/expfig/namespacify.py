@@ -41,7 +41,8 @@ class Namespacify(UserDict):
         return nested_dict_update(self, *args, nest_namespacify=True, **kwargs)
 
     def pprint(self, indent=0):
-        print("{}{}:".format(' ' * indent, self.name))
+        name = self.name if self.name else 'config'
+        print("{}{}:".format(' ' * indent, name))
 
         indent += 4
 
