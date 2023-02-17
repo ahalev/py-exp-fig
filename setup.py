@@ -14,7 +14,7 @@ EXTRAS = {
 }
 
 setup(
-    name="expfig",
+    name='experiment-config',
     package_dir={'': 'src'},
     packages=find_packages('src'),
     python_requires='>=3.6',
