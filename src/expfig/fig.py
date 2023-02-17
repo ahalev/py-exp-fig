@@ -131,6 +131,16 @@ class Config(Namespacify):
 
         return parser
 
+    def _extract_verbosity(self, config):
+        self.verbosity = config['verbose']
+
+        try:
+            _ = self.default_config.verbose
+        except AttributeError:
+            config.pop('verbose')
+
+        return config
+
     def _restructure_arguments(self, config):
         if isinstance(config, dict):
             keys = [key.split('.') for key in config.keys()]
