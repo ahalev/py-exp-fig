@@ -3,7 +3,7 @@
 Install with pip:
 
 ```shell script
-pip install expfig
+pip install experiment-config
 ```
 
 ## Usage
