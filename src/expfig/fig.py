@@ -1,4 +1,5 @@
 import argparse
+import sys
 import os
 import pandas as pd
 import yaml
@@ -18,29 +19,32 @@ class Config(Namespacify):
     def __init__(self, config=None, keys_for_name=('algo', 'type'), name_prefix='', default=DEFAULT_CONFIG_PATH):
         self.default_config = DefaultConfig(self._parse_default(config, default)).with_name_from_keys(*keys_for_name, prefix=name_prefix)
 
+        self.verbosity = 0
+
         super().__init__(self._parse_config())
 
         if config is not None:
             self._update_with_config(config)
 
         self.with_name_from_keys(*keys_for_name, prefix=name_prefix)
-        self._verbose()
+        self.verbose(self.verbosity)
 
     def _parse_default(self, config, default):
-        if os.path.exists(default):
-            return default
-        elif config is not None and os.path.exists(config):
-            return config
-        else:
-            raise ValueError(f'Default config path {default} does not point to a file and {config} does not either.')
+        candidates = [Path(default), (Path(sys.argv[0]).parent / default)]
 
-    def _verbose(self, level='from_config'):
-        if level == 'from_config':
-            try:
-                level = self.context.verbose
-            except AttributeError:
-                level = 0
+        if config is not None:
+            candidates.extend([Path(config), (Path(sys.argv[0]).parent / config)])
 
+        for candidate in candidates:
+            if candidate.exists():
+                return candidate
+
+        candidates_str = '\n\t'.join(str(x.absolute()) for x in candidates)
+        err_msg = f'Attempted to resolve default config in the following order:\n\t{candidates_str}.\n' \
+                  f'Unable to find a file amongst these candidates.'
+        raise ValueError(err_msg)
+
+    def verbose(self, level):
         if level >= 2:
             print('Trainer config:')
             self.pprint(indent=1)
