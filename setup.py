@@ -3,10 +3,12 @@ from setuptools import setup, find_packages
 
 DESCRIPTION = 'A yaml-based configuration for reproducible python experiments.'
 VERSION = '0.1'
-PROJECT_URLS = {}
 MAINTAINER = 'Avishai Halev'
 MAINTAINER_EMAIL = 'avishaihalev@gmail.com'
 LICENSE = 'MIT License'
+PROJECT_URLS = {
+    'Source Code': 'https://github.com/ahalev/experiment-config'
+}
 EXTRAS = {
     'dev': ['pytest']
 }
