@@ -13,6 +13,8 @@ class Namespacify(UserDict):
     def __init__(self, in_dict, name=''):
         self.name = name
 
+        in_dict = in_dict.copy()
+
         for key in in_dict.keys():
             if key == 'name':
                 raise NameError(f"Cannot use key 'name'.")
