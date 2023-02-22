@@ -65,6 +65,20 @@ class Namespacify(UserDict):
         return {k: v.to_dict() if isinstance(v, Namespacify) else (v.copy() if hasattr(v, 'copy') else v)
                 for k, v in self.items()}
 
+    def intersection(self, other):
+        intersection = {}
+
+        for k, v in self.items():
+            if k in other:
+                if other[k] == v:
+                    intersection[k] = v
+                elif isinstance(v, Namespacify) and isinstance(other[k], Namespacify):
+                    subint = v.intersection(other[k])
+                    if subint:
+                        intersection[k] = subint
+
+        return intersection
+
     def serialize(self, stream=None):
         return yaml.safe_dump(self, stream=stream)
 
@@ -103,20 +117,6 @@ class Namespacify(UserDict):
             return self[item]
         except KeyError:
             raise AttributeError(item)
-
-    def intersection(self, other):
-        intersection = {}
-
-        for k, v in self.items():
-            if k in other:
-                if other[k] == v:
-                    intersection[k] = v
-                elif isinstance(v, Namespacify) and isinstance(other[k], Namespacify):
-                    subint = v.intersection(other[k])
-                    if subint:
-                        intersection[k] = subint
-
-        return intersection
 
     def __xor__(self, other):
         diff = {}
