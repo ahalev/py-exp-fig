@@ -86,6 +86,14 @@ class Namespacify(UserDict):
         rv = rv | set(self.keys())
         return sorted(rv)
 
+    def __getitem__(self, item):
+        if isinstance(item, tuple):
+            out = self[item[0]]
+            if len(item) == 1:
+                return out
+            return out[item[1:]]
+        return super().__getitem__(item)
+
     def __getattr__(self, item):
         if item == 'data':
             raise RuntimeError('Attempting to access self.data before initialization.')
