@@ -51,7 +51,7 @@ class Config(Namespacify):
     def _parse_default(self, config, default):
         candidates = [Path(default), (Path(sys.argv[0]).parent / default)]
 
-        if config is not None:
+        if config is not None and isinstance(config, str):
             candidates.extend([Path(config), (Path(sys.argv[0]).parent / config)])
 
         for candidate in candidates:
