@@ -79,6 +79,28 @@ class Namespacify(UserDict):
 
         return intersection
 
+    def symmetric_difference(self, other):
+        diff = {}
+
+        keys = {*self.keys(), *other.keys()}
+        for k in keys:
+            if k not in self:
+                diff[k] = other[k]
+                continue
+
+            elif k not in other:
+                diff[k] = self[k]
+                continue
+
+            elif self[k] != other[k]:
+                if isinstance(self[k], Namespacify):
+                    diff[k] = self[k].__xor__(other[k])
+                else:
+                    diff[k] = self[k]
+
+        return Namespacify(diff, name=self.name)
+
+
     def serialize(self, stream=None):
         return yaml.safe_dump(self, stream=stream)
 
@@ -119,25 +141,7 @@ class Namespacify(UserDict):
             raise AttributeError(item)
 
     def __xor__(self, other):
-        diff = {}
-
-        keys = {*self.keys(), *other.keys()}
-        for k in keys:
-            if k not in self:
-                diff[k] = other[k]
-                continue
-
-            elif k not in other:
-                diff[k] = self[k]
-                continue
-
-            elif self[k] != other[k]:
-                if isinstance(self[k], Namespacify):
-                    diff[k] = self[k].__xor__(other[k])
-                else:
-                    diff[k] = self[k]
-
-        return Namespacify(diff, name=self.name)
+        return self.symmetric_difference(other)
 
     def __and__(self, other):
         return self.intersection(other)
