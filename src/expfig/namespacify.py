@@ -94,6 +94,20 @@ class Namespacify(UserDict):
         except KeyError:
             raise AttributeError(item)
 
+    def intersection(self, other):
+        intersection = {}
+
+        for k, v in self.items():
+            if k in other:
+                if other[k] == v:
+                    intersection[k] = v
+                elif isinstance(v, Namespacify) and isinstance(other[k], Namespacify):
+                    subint = v.intersection(other[k])
+                    if subint:
+                        intersection[k] = subint
+
+        return intersection
+
     def __xor__(self, other):
         diff = {}
 
@@ -114,6 +128,9 @@ class Namespacify(UserDict):
                     diff[k] = self[k]
 
         return Namespacify(diff, name=self.name)
+
+    def __and__(self, other):
+        return self.intersection(other)
 
 
 def nested_dict_update(nested_dict, *args, nest_namespacify=False, **kwargs):
