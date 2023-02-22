@@ -1,6 +1,8 @@
 import pytest
 import yaml
 
+from copy import deepcopy
+
 from expfig.namespacify import Namespacify
 
 CONTENTS = {
@@ -147,3 +149,55 @@ class TestNestNamespacify:
 
     def test_update(self):
         pass
+
+    def test_exact_intersection(self):
+        namespacify = Namespacify(NESTED_CONTENTS)
+        print(deepcopy(namespacify))
+        intersection = namespacify.intersection(namespacify)
+        assert intersection == namespacify
+
+    def test_intersection_top_level_difference(self):
+        other_contents = deepcopy(NESTED_CONTENTS)
+        other_contents['jeep'] = 'missing'
+
+        ns1 = Namespacify(NESTED_CONTENTS)
+        ns2 = Namespacify(other_contents)
+
+        intersection1 = ns1.intersection(ns2)
+        intersection2 = ns2.intersection(ns1)
+
+        assert intersection1 == intersection2
+
+        assert 'jeep' not in intersection1
+
+        for k, v in NESTED_CONTENTS.items():
+            if k == 'jeep':
+                continue
+            else:
+                assert k in intersection1
+                assert intersection1[k] == v
+
+    def test_intersection_bottom_level_difference(self):
+        other_contents = deepcopy(NESTED_CONTENTS)
+        other_contents['jeep']['car'] = 'missing'
+
+        ns1 = Namespacify(NESTED_CONTENTS)
+        ns2 = Namespacify(other_contents)
+
+        intersection1 = ns1.intersection(ns2)
+        intersection2 = ns2.intersection(ns1)
+
+        assert intersection1 == intersection2
+
+        assert 'jeep' in intersection1
+        assert 'car' not in intersection1['jeep']
+
+        for k, v in NESTED_CONTENTS.items():
+            if k == 'jeep':
+                for k_i, v_i in v.items():
+                    if k_i == 'car':
+                        continue
+                    assert v_i == intersection1[k][k_i]
+            else:
+                assert k in intersection1
+                assert intersection1[k] == v
