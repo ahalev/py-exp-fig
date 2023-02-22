@@ -132,6 +132,9 @@ class Namespacify(UserDict):
     def __and__(self, other):
         return self.intersection(other)
 
+    def __deepcopy__(self, memo=None):
+        return Namespacify(self.to_dict(), self.name)
+
 
 def nested_dict_update(nested_dict, *args, nest_namespacify=False, **kwargs):
     if args:
