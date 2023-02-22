@@ -77,7 +77,7 @@ class Namespacify(UserDict):
                     if subint:
                         intersection[k] = subint
 
-        return intersection
+        return Namespacify(intersection, name=self.name if self.name == other.name else '')
 
     def symmetric_difference(self, other):
         diff = {}
