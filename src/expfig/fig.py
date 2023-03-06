@@ -6,13 +6,12 @@ import yaml
 
 
 from collections import UserDict
-from logging import getLogger
 from pathlib import Path
 from warnings import warn
 
 from . import Namespacify, nested_dict_update
+from .logging import get_logger
 
-logger = getLogger(__name__)
 
 DEFAULT_CONFIG_PATH = os.path.join(os.getcwd(), 'default_config.yaml')
 
@@ -21,6 +20,7 @@ class Config(Namespacify):
     def __init__(self, config=None, keys_for_name=(), name_prefix='', default=DEFAULT_CONFIG_PATH):
         self.default_config = DefaultConfig(self._parse_default(config, default)).with_name_from_keys(*keys_for_name, prefix=name_prefix)
 
+        self.logger = get_logger()
         self.verbosity = 0
 
         super().__init__(self._parse_config())
