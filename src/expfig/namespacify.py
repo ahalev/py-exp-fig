@@ -47,9 +47,11 @@ class Namespacify(UserDict):
     def update(self, *args, **kwargs):
         return nested_dict_update(self, *args, nest_namespacify=True, **kwargs)
 
-    def pprint(self, indent=0):
+    def pprint(self, indent=0, log_func=None, _recur=False):
+        log_block = ''
         name = self.name if self.name else 'config'
-        print("{}{}:".format(' ' * indent, name))
+
+        log_block += "{}{}:".format(' ' * indent, name)
 
         indent += 4
 
@@ -57,9 +59,17 @@ class Namespacify(UserDict):
             if k == "name":
                 continue
             if isinstance(v, Namespacify):
-                v.pprint(indent)
+                log_block += f'\n{v.pprint(indent, _recur=True)}'
             else:
-                print("{}{}: {}".format(' ' * indent, k, v))
+                log_block+= f'\n{" " * indent}{k}: {v}'
+
+        if not _recur:
+            if log_func is None:
+                print(log_block)
+            else:
+                log_func(log_block)
+
+        return log_block
 
     def to_dict(self):
         return {k: v.to_dict() if isinstance(v, Namespacify) else (v.copy() if hasattr(v, 'copy') else v)
