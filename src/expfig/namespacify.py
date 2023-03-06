@@ -164,7 +164,9 @@ def nested_dict_update(nested_dict, *args, nest_namespacify=False, **kwargs):
     for k, v in d.items():
         if isinstance(v, (dict, UserDict)):
             if k in nested_dict:
-                nested_dict[k].update(v)
+                nested_dict_update(
+                    nested_dict[k], v, nest_namespacify=(nest_namespacify or isinstance(nested_dict[k], Namespacify))
+                )
             else:
                 nested_dict[k] = Namespacify(v, name=k) if nest_namespacify else v
         else:
