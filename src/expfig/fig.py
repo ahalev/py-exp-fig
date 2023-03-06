@@ -65,16 +65,16 @@ class Config(Namespacify):
 
     def verbose(self, level):
         if level >= 2:
-            logger.info('Trainer config:')
-            self.pprint(indent=1)
+            self.logger.info('Trainer config:')
+            self.pprint(indent=1, log_func=self.logger.info)
         if level >= 1:
             xor = self ^ self.default_config
             print(f'\n{"-"*10}\n')
             if xor:
-                logger.info('Custom trainer config (difference from default):')
-                xor.pprint(indent=1)
+                self.logger.info('Custom trainer config (difference from default):')
+                xor.pprint(indent=1, log_func=self.logger.info)
             else:
-                logger.info('No difference from default.')
+                self.logger.info('No difference from default.')
 
     def _update_with_config(self, config, updatee=None):
         if isinstance(config, str):
