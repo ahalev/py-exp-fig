@@ -3,7 +3,7 @@ import yaml
 from collections import UserDict
 from logging import getLogger
 
-from .logger import make_sequential_log_dir
+from .logging import make_sequential_log_dir
 
 yaml.SafeDumper.add_multi_representer(UserDict, yaml.SafeDumper.represent_dict)
 logger = getLogger(__name__)
