@@ -235,6 +235,23 @@ There are three other ways to define custom settings/hyperparameters:
      config = Config(config_dict)
      ```
 
+## Hyperparameter Resolution Order
+
+You may encounter the situation where you pass the same key in different ways, with different values. For example, you may have a key in both your default config, a config passed via `--config path_to_a_config.yaml`, 
+and by direct argument at the command line: `--key value`.
+
+For any key set in your default config, the resolution order is as follows:
+
+1. Values passed directly to `expfig.Config` upon object initialization. This includes values
+   defined within a config file passed to `expfig.Config`: `expfig.Config(config='path_to_a_config.yaml)`.
+
+2. Values passed explicitly at the command line.
+
+3. Values within a config file passed at the command line. If multiple config files are passed and the 
+   key is contained in more than one of said files, the value from the *last* file will be used.
+
+4. Values within your default config.
+
 
 ## Additional Examples
 
