@@ -64,6 +64,31 @@ class Config(Namespacify):
                   f'Unable to find a file amongst these candidates.'
         raise ValueError(err_msg)
 
+    def _parse_config(self):
+        # First we parse any --config arguments and load those
+        # Then we can override them with any other passed values.
+        base_config = deepcopy(self.default_config)
+        config_files, other_args = self._create_config_file_parser().parse_known_args()
+
+        for config_file in config_files.config:
+            self._update_with_config(config_file, updatee=base_config)
+
+        parsed_args = self._create_parser(default=base_config).parse_known_args(other_args)
+
+        if len(parsed_args[1]):
+            bad_args = [x.replace("--", "") for x in parsed_args[1] if x.startswith("--")]
+            valid_args = "\n\t\t".join(sorted(parsed_args[0].__dict__.keys()))
+            warn(f'Unrecognized arguments {bad_args}.\n\tValid arguments:\n\t\t{valid_args}')
+
+        args_dict = parsed_args[0].__dict__
+
+        args_dict = self._extract_verbosity(args_dict)
+        restructured = self._restructure_arguments(args_dict)
+
+        self._check_restructured(restructured, self.default_config)
+        return restructured
+
+
     def verbose(self, level):
         if level >= 2:
             self.logger.info('Trainer config:')
@@ -121,30 +146,6 @@ class Config(Namespacify):
             arg["nargs"] = '+'
 
         return arg
-
-    def _parse_config(self):
-        # First we parse any --config arguments and load those
-        # Then we can override them with any other passed values.
-        base_config = deepcopy(self.default_config)
-        config_files, other_args = self._create_config_file_parser().parse_known_args()
-
-        for config_file in config_files.config:
-            self._update_with_config(config_file, updatee=base_config)
-
-        parsed_args = self._create_parser(default=base_config).parse_known_args(other_args)
-
-        if len(parsed_args[1]):
-            bad_args = [x.replace("--", "") for x in parsed_args[1] if x.startswith("--")]
-            valid_args = "\n\t\t".join(sorted(parsed_args[0].__dict__.keys()))
-            warn(f'Unrecognized arguments {bad_args}.\n\tValid arguments:\n\t\t{valid_args}')
-
-        args_dict = parsed_args[0].__dict__
-
-        args_dict = self._extract_verbosity(args_dict)
-        restructured = self._restructure_arguments(args_dict)
-
-        self._check_restructured(restructured, self.default_config)
-        return restructured
 
     def _create_parser(self, default=None):
         parser = argparse.ArgumentParser(prog='GridRL')
