@@ -150,6 +150,18 @@ class Namespacify(UserDict):
         except KeyError:
             raise AttributeError(item)
 
+    def __setattr__(self, key, value):
+        try:
+            contains_key = key in self
+        except RuntimeError:
+            pass
+        else:
+            if contains_key:
+                self[key] = value
+                return
+
+        super().__setattr__(key, value)
+
     def __xor__(self, other):
         return self.symmetric_difference(other)
 
