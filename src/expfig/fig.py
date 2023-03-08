@@ -103,19 +103,6 @@ class Config(Namespacify):
         parser.add_argument('--config', default=[], nargs='+')
         return parser
 
-    def verbose(self, level):
-        if level >= 2:
-            self.logger.info('Trainer config:')
-            self.pprint(indent=1, log_func=self.logger.info)
-        if level >= 1:
-            xor = self ^ self.default_config
-            print(f'\n{"-"*10}\n')
-            if xor:
-                self.logger.info('Custom trainer config (difference from default):')
-                xor.pprint(indent=1, log_func=self.logger.info)
-            else:
-                self.logger.info('No difference from default.')
-
     def _update_with_config(self, config, updatee=None):
         if isinstance(config, str):
             config = _config_from_yaml(config)
@@ -197,6 +184,19 @@ class Config(Namespacify):
                 raise RuntimeError(f'Missing key {"->".join([*stack, key])} in restructured config.')
             elif isinstance(value, dict):
                 self._check_restructured(restructured[key], value, *stack, key)
+
+    def verbose(self, level):
+        if level >= 2:
+            self.logger.info('Trainer config:')
+            self.pprint(indent=1, log_func=self.logger.info)
+        if level >= 1:
+            xor = self ^ self.default_config
+            print(f'\n{"-"*10}\n')
+            if xor:
+                self.logger.info('Custom trainer config (difference from default):')
+                xor.pprint(indent=1, log_func=self.logger.info)
+            else:
+                self.logger.info('No difference from default.')
 
 
 class DefaultConfig(Namespacify):
