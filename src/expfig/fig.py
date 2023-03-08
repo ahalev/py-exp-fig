@@ -106,31 +106,6 @@ class Config(Namespacify):
 
         return config
 
-    def _get_arguments(self, key='', d=None):
-        if d is None:
-            d = self.default_config
-
-        args = {}
-
-        for k, v in d.items():
-            new_key = f'{key}.{k}' if key else k
-            if isinstance(v, (dict, UserDict)):
-                args.update(self._get_arguments(key=new_key, d=v))
-            else:
-                args[new_key] = self._collect_argument(v)
-
-        return args
-
-    def _collect_argument(self, default_val):
-        arg = {
-            'default': default_val,
-            'type': type(default_val),
-        }
-        if hasattr(default_val, '__len__') and not isinstance(default_val, str):
-            arg["nargs"] = '+'
-
-        return arg
-
     def _extract_verbosity(self, config):
         self.verbosity = config['verbose']
 
@@ -167,6 +142,31 @@ class Config(Namespacify):
                 raise RuntimeError(f'Missing key {"->".join([*stack, key])} in restructured config.')
             elif isinstance(value, dict):
                 self._check_restructured(restructured[key], value, *stack, key)
+
+    def _get_arguments(self, key='', d=None):
+        if d is None:
+            d = self.default_config
+
+        args = {}
+
+        for k, v in d.items():
+            new_key = f'{key}.{k}' if key else k
+            if isinstance(v, (dict, UserDict)):
+                args.update(self._get_arguments(key=new_key, d=v))
+            else:
+                args[new_key] = self._collect_argument(v)
+
+        return args
+
+    def _collect_argument(self, default_val):
+        arg = {
+            'default': default_val,
+            'type': type(default_val),
+        }
+        if hasattr(default_val, '__len__') and not isinstance(default_val, str):
+            arg["nargs"] = '+'
+
+        return arg
 
     def serialize_to_dir(self, log_dir, fname='config.yaml', use_existing_dir=False, with_default=False):
         log_dir = super().serialize_to_dir(log_dir, fname=fname, use_existing_dir=use_existing_dir)
