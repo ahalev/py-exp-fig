@@ -83,9 +83,9 @@ class Config(Namespacify):
         config = self._restructure_as_necessary(config)
 
         if updatee:
-            nested_dict_update(updatee, config)
+            return nested_dict_update(updatee, config)
         else:
-            nested_dict_update(self, config)
+            return nested_dict_update(self, config)
 
     def _restructure_as_necessary(self, config):
         if any('.' in k for k in config.keys()):
