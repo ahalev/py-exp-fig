@@ -110,6 +110,18 @@ class Namespacify(UserDict):
 
         return Namespacify(diff, name=self.name)
 
+    def difference(self, other):
+        diff = {}
+        for k, v in self.items():
+            if k not in other:
+                diff[k] = v
+            elif v != other[k]:
+                if isinstance(v, Namespacify):
+                    diff[k] = v.difference(other[k])
+                else:
+                    diff[k] = v
+
+        return Namespacify(diff, name=self.name)
 
     def serialize(self, stream=None):
         return yaml.safe_dump(self, stream=stream)
@@ -167,6 +179,9 @@ class Namespacify(UserDict):
 
     def __and__(self, other):
         return self.intersection(other)
+
+    def __sub__(self, other):
+        return self.difference(other)
 
     def __deepcopy__(self, memo=None):
         return Namespacify(self.to_dict(), self.name)
