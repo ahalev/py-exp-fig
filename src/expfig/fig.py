@@ -88,6 +88,20 @@ class Config(Namespacify):
         self._check_restructured(restructured, self.default_config)
         return restructured
 
+    def _create_parser(self, default=None):
+        parser = argparse.ArgumentParser(prog='GridRL')
+        for arg_name, arg_info in self._get_arguments(d=default).items():
+            parser.add_argument(f'--{arg_name}', **arg_info)
+
+        if parser.get_default('verbose') is None:
+            parser.add_argument('--verbose', default=0, type=int)
+
+        return parser
+
+    def _create_config_file_parser(self):
+        parser = argparse.ArgumentParser(prog='GridRLConfig')
+        parser.add_argument('--config', default=[], nargs='+')
+        return parser
 
     def verbose(self, level):
         if level >= 2:
@@ -146,21 +160,6 @@ class Config(Namespacify):
             arg["nargs"] = '+'
 
         return arg
-
-    def _create_parser(self, default=None):
-        parser = argparse.ArgumentParser(prog='GridRL')
-        for arg_name, arg_info in self._get_arguments(d=default).items():
-            parser.add_argument(f'--{arg_name}', **arg_info)
-
-        if parser.get_default('verbose') is None:
-            parser.add_argument('--verbose', default=0, type=int)
-
-        return parser
-
-    def _create_config_file_parser(self):
-        parser = argparse.ArgumentParser(prog='GridRLConfig')
-        parser.add_argument('--config', default=[], nargs='+')
-        return parser
 
     def _extract_verbosity(self, config):
         self.verbosity = config['verbose']
