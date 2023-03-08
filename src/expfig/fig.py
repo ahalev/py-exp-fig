@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import yaml
 
+from copy import deepcopy
 
 from collections import UserDict
 from pathlib import Path
@@ -122,7 +123,15 @@ class Config(Namespacify):
         return arg
 
     def _parse_config(self):
-        parsed_args = self._create_parser().parse_known_args()
+        # First we parse any --config arguments and load those
+        # Then we can override them with any other passed values.
+        base_config = deepcopy(self.default_config)
+        config_files, other_args = self._create_config_file_parser().parse_known_args()
+
+        for config_file in config_files.config:
+            self._update_with_config(config_file, updatee=base_config)
+
+        parsed_args = self._create_parser(default=base_config).parse_known_args(other_args)
 
         if len(parsed_args[1]):
             bad_args = [x.replace("--", "") for x in parsed_args[1] if x.startswith("--")]
@@ -131,28 +140,25 @@ class Config(Namespacify):
 
         args_dict = parsed_args[0].__dict__
 
-        config_files = args_dict.pop('config')
-
         args_dict = self._extract_verbosity(args_dict)
         restructured = self._restructure_arguments(args_dict)
-
-        if config_files is not None:
-            for config_file in config_files:
-                self._update_with_config(config_file, updatee=restructured)
 
         self._check_restructured(restructured, self.default_config)
         return restructured
 
-    def _create_parser(self):
+    def _create_parser(self, default=None):
         parser = argparse.ArgumentParser(prog='GridRL')
-        for arg_name, arg_info in self._get_arguments().items():
+        for arg_name, arg_info in self._get_arguments(d=default).items():
             parser.add_argument(f'--{arg_name}', **arg_info)
-
-        parser.add_argument('--config', default=None, nargs='+')
 
         if parser.get_default('verbose') is None:
             parser.add_argument('--verbose', default=0, type=int)
 
+        return parser
+
+    def _create_config_file_parser(self):
+        parser = argparse.ArgumentParser(prog='GridRLConfig')
+        parser.add_argument('--config', default=[], nargs='+')
         return parser
 
     def _extract_verbosity(self, config):
