@@ -161,7 +161,7 @@ class Config(Namespacify):
     def _collect_argument(self, default_val):
         arg = {
             'default': default_val,
-            'type': type(default_val),
+            'type': type(default_val) if default_val is not None else str,
         }
         if hasattr(default_val, '__len__') and not isinstance(default_val, str):
             arg["nargs"] = '+'
