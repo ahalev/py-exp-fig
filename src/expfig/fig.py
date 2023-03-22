@@ -159,9 +159,14 @@ class Config(Namespacify):
         return args
 
     def _collect_argument(self, default_val):
+        if not default_val and not isinstance(default_val, (float, int, bool)):
+            _type = str
+        else:
+            _type = type(default_val)
+
         arg = {
             'default': default_val,
-            'type': type(default_val) if default_val is not None else str,
+            'type': _type,
         }
         if hasattr(default_val, '__len__') and not isinstance(default_val, str):
             arg["nargs"] = '+'
