@@ -147,11 +147,16 @@ class Namespacify(UserDict):
         return sorted(rv)
 
     def __getitem__(self, item):
-        if isinstance(item, tuple):
+        if item[0] == slice(None) or isinstance(item[0], list):
+            keys = self.keys() if item[0] == slice(None) else item[0]
+            return {k: self[k][item[1:]] for k in keys}
+
+        elif isinstance(item, tuple):
             out = self[item[0]]
             if len(item) == 1:
                 return out
             return out[item[1:]]
+
         return super().__getitem__(item)
 
     def __getattr__(self, item):
