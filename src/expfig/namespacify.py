@@ -164,7 +164,7 @@ class Namespacify(UserDict):
             raise RuntimeError('Attempting to access self.data before initialization.')
         try:
             return self[item]
-        except KeyError:
+        except (KeyError, RuntimeError):
             raise AttributeError(item)
 
     def __setattr__(self, key, value):
