@@ -26,8 +26,9 @@ class Config(Namespacify):
 
         super().__init__(self._parse_config())
 
-        if config is not None:
-            self._update_with_config(config)
+        self.update_with_configs(config)
+        # if config is not None:
+        #     self._update_with_config(config)
 
         self.with_name_from_keys(*keys_for_name, prefix=name_prefix)
         self.verbose(self.verbosity)
@@ -53,8 +54,9 @@ class Config(Namespacify):
         base_config = deepcopy(self.default_config)
         config_files, other_args = self._create_config_file_parser().parse_known_args()
 
-        for config_file in config_files.config:
-            self._update_with_config(config_file, updatee=base_config)
+        self.update_with_configs(config_files.config, base_config)
+        # for config_file in config_files.config:
+        #     self._update_with_config(config_file, updatee=base_config)
 
         parsed_args = self._create_parser(default=base_config).parse_known_args(other_args)
 
@@ -85,6 +87,17 @@ class Config(Namespacify):
         parser = argparse.ArgumentParser(prog='GridRLConfig')
         parser.add_argument('--config', default=[], nargs='+')
         return parser
+
+    def update_with_configs(self, configs, updatee=None):
+        if configs is None:
+            return self
+        elif not pd.api.types.is_list_like(configs) or pd.api.types.is_dict_like(configs):
+            configs = [configs]
+
+        for config in configs:
+            updatee = self._update_with_config(config, updatee=updatee)
+
+        return updatee
 
     def _update_with_config(self, config, updatee=None):
         if isinstance(config, (str, Path)):
