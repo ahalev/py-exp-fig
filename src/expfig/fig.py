@@ -223,7 +223,7 @@ class DefaultConfig(Namespacify):
 
 
 def _config_from_yaml(file_path):
-    contents = Path(file_path).open('r')
+    contents = Path(file_path).expanduser().open('r')
     loaded_contents = yaml.safe_load(contents)
 
     if not isinstance(loaded_contents, dict):
