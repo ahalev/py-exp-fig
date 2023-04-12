@@ -68,7 +68,7 @@ class Config(Namespacify):
         args_dict = parsed_args[0].__dict__
 
         args_dict = self._extract_verbosity(args_dict)
-        restructured = self._restructure_arguments(args_dict)
+        restructured = restructure_arguments(args_dict)
 
         self._check_restructured(restructured, self.default_config)
         return restructured
@@ -115,7 +115,7 @@ class Config(Namespacify):
             if any(isinstance(v, dict) for v in config.values()):
                 raise ValueError('Cannot combine nested dict config arguments with "." deliminated arguments.')
 
-            config = self._restructure_arguments(config)
+            config = restructure_arguments(config)
 
         return config
 
@@ -128,26 +128,6 @@ class Config(Namespacify):
             config.pop('verbose')
 
         return config
-
-    def _restructure_arguments(self, config):
-        if isinstance(config, dict):
-            keys = [key.split('.') for key in config.keys()]
-            keys_series = pd.Series(index=pd.MultiIndex.from_frame(pd.DataFrame(keys)), data=config.values())
-        else:
-            keys_series = config
-
-        restructured = {}
-
-        for key in keys_series.index.get_level_values(0).unique():
-            subset = keys_series[key]
-            if subset.index.dropna('all').empty:
-                restructured.update({key: subset.item()})
-            elif subset.index.dropna().nlevels == 1:
-                restructured.update({key: subset.to_dict()})
-            else:
-                restructured.update({key: self._restructure_arguments(subset)})
-
-        return restructured
 
     def _check_restructured(self, restructured, default_config, *stack):
         for key, value in default_config.items():
@@ -231,3 +211,16 @@ def _config_from_yaml(file_path):
                          f'{type(loaded_contents).__name__}, should be dict.')
 
     return loaded_contents
+
+
+def restructure_arguments(arguments):
+    if set(arguments.keys()) == {''}:
+        return arguments['']
+
+    restructured = {}
+    for key, value in arguments.items():
+        top_key, _, bottom_keys = key.partition('.')
+        update_with = {top_key: restructure_arguments({bottom_keys: value})}
+        nested_dict_update(restructured, update_with)
+
+    return restructured
