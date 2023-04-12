@@ -1,0 +1,9 @@
+jeep:
+  sound: vroom
+  wheels: 4
+  axles: 2
+truck:
+  sound: skirt
+  wheels: 18
+  axles: 6
+verbose: 0
