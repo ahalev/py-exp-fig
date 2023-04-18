@@ -161,8 +161,8 @@ class Config(Namespacify):
             'default': default_val,
             'type': _type,
         }
-        if hasattr(default_val, '__len__') and not isinstance(default_val, str):
-            arg["nargs"] = '+'
+        if pd.api.types.is_list_like(default_val):
+            arg['nargs'] = '+'
 
         return arg
 
