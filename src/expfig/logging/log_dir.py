@@ -1,4 +1,5 @@
 import os
+import tempfile
 
 
 def make_sequential_log_dir(log_dir, subdirs=(), use_existing_dir=False):
@@ -10,7 +11,7 @@ def make_sequential_log_dir(log_dir, subdirs=(), use_existing_dir=False):
     "_1". If that already exists, appends "_2" instead, etc.
 
     Args:
-        log_dir (str): The log directory to attempt to create.
+        log_dir (str or None): The log directory to attempt to create. If None, logs to a temporary directory
         subdirs (list of str): subdirectories to create in the log_dir directory.
         use_existing_dir (bool): whether to simply return the dir if it exists (will log to existing dir).
 
@@ -18,6 +19,10 @@ def make_sequential_log_dir(log_dir, subdirs=(), use_existing_dir=False):
         str: The log directory actually created.
 
     """
+
+    if log_dir is None:
+        log_dir = tempfile.mkdtemp()
+
     i = 0
     while True:
         try:
