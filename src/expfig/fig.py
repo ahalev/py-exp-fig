@@ -148,19 +148,34 @@ class Config(Namespacify):
         return args
 
     def _collect_argument(self, default_val):
-        if not default_val and not isinstance(default_val, (float, int, bool)):
+        arg = {}
+
+        if pd.api.types.is_list_like(default_val):
+            arg['nargs'] = '+'
+            _type = self._get_list_like_type(default_val)
+
+        elif not default_val and not isinstance(default_val, (float, int, bool)):
             _type = str
         else:
             _type = type(default_val)
 
-        arg = {
-            'default': default_val,
-            'type': _type,
-        }
-        if pd.api.types.is_list_like(default_val):
-            arg['nargs'] = '+'
+        arg.update({'default': default_val, 'type': _type})
 
         return arg
+
+    def _get_list_like_type(self, list_like):
+        _types = pd.Series([type(x) for x in list_like])
+
+        try:
+            _type = _types.unique().item()
+        except ValueError:
+            _type = str
+
+            if len(_types):
+                warn('Collecting argument with non-unique types in default value.'
+                     'Collected values will be str.')
+
+        return _type
 
     def serialize_to_dir(self, log_dir, fname='config.yaml', use_existing_dir=False, with_default=False):
         log_dir = super().serialize_to_dir(log_dir, fname=fname, use_existing_dir=use_existing_dir)
