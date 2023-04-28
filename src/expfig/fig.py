@@ -27,8 +27,6 @@ class Config(Namespacify):
         super().__init__(self._parse_config())
 
         self.update_with_configs(config)
-        # if config is not None:
-        #     self._update_with_config(config)
 
         self.with_name_from_keys(*keys_for_name, prefix=name_prefix)
         self.verbose(self.verbosity)
@@ -55,8 +53,6 @@ class Config(Namespacify):
         config_files, other_args = self._create_config_file_parser().parse_known_args()
 
         self.update_with_configs(config_files.config, base_config)
-        # for config_file in config_files.config:
-        #     self._update_with_config(config_file, updatee=base_config)
 
         parsed_args = self._create_parser(default=base_config).parse_known_args(other_args)
 
