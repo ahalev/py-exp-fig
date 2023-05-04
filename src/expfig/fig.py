@@ -61,7 +61,7 @@ class Config(Namespacify):
             valid_args = "\n\t\t".join(sorted(parsed_args[0].__dict__.keys()))
             warn(f'Unrecognized arguments {bad_args}.\n\tValid arguments:\n\t\t{valid_args}')
 
-        args_dict = parsed_args[0].__dict__
+        args_dict = {k: v if v != 'null' else None for k, v in parsed_args[0].__dict__.items()}
 
         args_dict = self._extract_verbosity(args_dict)
         restructured = restructure_arguments(args_dict)
