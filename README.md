@@ -253,6 +253,20 @@ For any key set in your default config, the resolution order is as follows:
 4. Values within your default config.
 
 
+## Variations between different methods of setting parameters
+
+### 1. Type casting
+Values passed at the command line are casted to the type of the default value as defined by the yaml-load of the default
+value. For example, a default config containing `value: 1` will result in the expectation that `value` is an `int`. 
+This is not true with values passed in python code or in separate config files. 
+
+There are two exceptions to this: 
+
+1. Values where the default value is `None` parse command line arguments to string.
+
+2. The string `null` passed at the command line results in the value `None`. 
+
+
 ## Additional Examples
 
 An example of using `expfig.Config` to set hyperparameters for a machine learning problem
