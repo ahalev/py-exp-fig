@@ -1,4 +1,5 @@
 import pytest
+import pandas as pd
 import yaml
 
 from copy import deepcopy
@@ -201,3 +202,11 @@ class TestNestNamespacify:
             else:
                 assert k in intersection1
                 assert intersection1[k] == v
+
+    def test_to_series(self):
+        ns = Namespacify(NESTED_CONTENTS)
+        series = ns.to_series()
+
+        assert series.loc['jeep'].equals(pd.Series(CONTENTS))
+        assert series.loc['truck'].equals(pd.Series(NESTED_CONTENTS['truck']))
+        assert series.loc[pd.IndexSlice[:, 'car']].equals(pd.Series(['vroom', 'skirt'], index=['jeep', 'truck']))
