@@ -90,6 +90,28 @@ class Namespacify(UserDict):
         return Namespacify(intersection, name=self.name if self.name == other.name else '')
 
     def symmetric_difference(self, other):
+        """
+        Get all values that differ in ``self`` or ``other``.
+
+        Returns the value in ``self`` if it exists and differs from ``other``. Otherwise returns the value in ``other``.
+
+        If ``self['a'] = 1`` and ``other['a'] = 2``, ``self.symmetric_difference(other)['a'] = 1``.
+        If ``self['a'] = 1`` and ``'a' not in other``, `self.symmetric_difference(other)['a'] = 1``.
+        If ``'a' not in self`` and ``other['a'] = 2``, `self.symmetric_difference(other)['a'] = 2``.
+
+
+        Parameters
+        ----------
+        other : dict-like
+            Object to compare against
+
+        Returns
+        -------
+        difference : :class:`.Namespacify`
+            Difference between ``self`` and ``other``.
+
+        """
+
         diff = {}
 
         keys = {*self.keys(), *other.keys()}
@@ -111,6 +133,23 @@ class Namespacify(UserDict):
         return Namespacify(diff, name=self.name)
 
     def difference(self, other):
+        """
+        Get all values that are in ``self`` that are NOT (or are different) in ``other``.
+
+        If ``self['a'] = 1`` and ``other['a'] = 2``, ``self.difference(other)['a'] = 1``.
+        If ``a not in self`` and ``other['a'] = 2``, ``self.difference(other)['a']`` returns a ``KeyError``.
+
+        Parameters
+        ----------
+        other : dict-like
+            Object to compare against
+
+        Returns
+        -------
+        difference : :class:`.Namespacify`
+            Difference between ``self`` and ``other``.
+
+        """
         diff = {}
         for k, v in self.items():
             if k not in other:
