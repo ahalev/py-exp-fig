@@ -1,3 +1,4 @@
+import pandas as pd
 import yaml
 
 from collections import UserDict
@@ -74,6 +75,11 @@ class Namespacify(UserDict):
     def to_dict(self):
         return {k: v.to_dict() if isinstance(v, Namespacify) else (v.copy() if hasattr(v, 'copy') else v)
                 for k, v in self.items()}
+
+    def to_series(self):
+        series = pd.json_normalize(self.to_dict()).squeeze()
+        series.index = pd.MultiIndex.from_tuples([x.split('.') for x in series.index])
+        return series
 
     def intersection(self, other):
         intersection = {}
