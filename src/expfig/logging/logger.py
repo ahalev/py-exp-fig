@@ -4,8 +4,11 @@ import sys
 
 def get_logger():
     logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
 
+    if logger.handlers:
+        return logger
+
+    logger.setLevel(logging.INFO)
     handler = logging.StreamHandler(sys.stdout)
     handler.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s')
