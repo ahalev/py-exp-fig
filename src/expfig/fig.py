@@ -32,6 +32,9 @@ class Config(Namespacify):
         self.verbose(self.verbosity)
 
     def _parse_default(self, config, default):
+        if pd.api.types.is_dict_like(default):
+            return default
+
         candidates = [Path(default), (Path(sys.argv[0]).parent / default)]
 
         if config is not None and isinstance(config, (str, Path)):
@@ -209,8 +212,11 @@ class Config(Namespacify):
 
 
 class DefaultConfig(Namespacify):
-    def __init__(self, file_path):
-        super().__init__(_config_from_yaml(file_path))
+    def __init__(self, default):
+        if not pd.api.types.is_dict_like(default):
+            default = _config_from_yaml(default)
+
+        super().__init__(default)
 
 
 def _config_from_yaml(file_path):
