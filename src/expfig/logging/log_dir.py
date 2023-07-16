@@ -11,6 +11,9 @@ def make_sequential_log_dir(log_dir, subdirs=(), use_existing_dir=False, logger_
     Attempts to create the directory `log_dir`. If it already exists, appends
     "_1". If that already exists, appends "_2" instead, etc.
 
+    If `logger_file` is not None, a logger will be created that logs to the file `logger_file` in the created `log_dir`.
+    This logger can be accessed by calling `expfig.logging.get_logger().
+
     Args:
         log_dir (str or None): The log directory to attempt to create. If None, logs to a temporary directory
         subdirs (list of str): subdirectories to create in the log_dir directory.
@@ -19,7 +22,7 @@ def make_sequential_log_dir(log_dir, subdirs=(), use_existing_dir=False, logger_
         logging_level: (int or str): Level for the logger, e.g. `INFO`. See python Logging module for more info.
 
     Returns:
-        str: The log directory actually created.
+        str: The log directory created.
 
     """
 
