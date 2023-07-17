@@ -3,7 +3,7 @@ import tempfile
 from expfig.logging import get_logger
 
 
-def make_sequential_log_dir(log_dir, subdirs=(), use_existing_dir=False, logger_file=None, logging_level=10):
+def make_sequential_log_dir(log_dir, subdirs=(), use_existing_dir=False, logger_file=None, logger_level=10):
     """Taken from rlworkgroup/garage.
 
     Creates log_dir, appending a number if necessary.
@@ -19,7 +19,7 @@ def make_sequential_log_dir(log_dir, subdirs=(), use_existing_dir=False, logger_
         subdirs (list of str): subdirectories to create in the log_dir directory.
         use_existing_dir (bool): whether to simply return the dir if it exists (will log to existing dir).
         logger_file (str or None): If not None, creates a logger that logs to this file within the log_dir.
-        logging_level: (int or str): Level for the logger, e.g. `INFO`. See python Logging module for more info.
+        logger_level: (int or str): Level for the logger, e.g. `INFO`. See python Logging module for more info.
 
     Returns:
         str: The log directory created.
@@ -51,7 +51,7 @@ def make_sequential_log_dir(log_dir, subdirs=(), use_existing_dir=False, logger_
         os.makedirs(os.path.join(log_dir, subdir), exist_ok=True)
 
     if logger_file:
-        logger = get_logger(level=logging_level, log_file=os.path.join(log_dir, logger_file))
+        logger = get_logger(level=logger_level, log_file=os.path.join(log_dir, logger_file))
         return log_dir
 
     return log_dir
