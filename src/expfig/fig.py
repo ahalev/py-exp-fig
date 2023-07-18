@@ -18,8 +18,8 @@ DEFAULT_CONFIG_PATH = os.path.join(os.getcwd(), 'default_config.yaml')
 
 
 class Config(Namespacify):
-    def __init__(self, config=None, keys_for_name=(), name_prefix='', default=DEFAULT_CONFIG_PATH):
-        self.default_config = DefaultConfig(self._parse_default(config, default)).with_name_from_keys(*keys_for_name, prefix=name_prefix)
+    def __init__(self, config=None, default=DEFAULT_CONFIG_PATH):
+        self.default_config = DefaultConfig(self._parse_default(config, default))
 
         self.logger = get_logger()
         self.verbosity = 0
@@ -27,8 +27,6 @@ class Config(Namespacify):
         super().__init__(self._parse_config())
 
         self.update_with_configs(config)
-
-        self.with_name_from_keys(*keys_for_name, prefix=name_prefix)
         self.verbose(self.verbosity)
 
     def _parse_default(self, config, default):
