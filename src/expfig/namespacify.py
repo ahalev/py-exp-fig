@@ -11,56 +11,22 @@ logger = getLogger(__name__)
 
 
 class Namespacify(UserDict):
-    def __init__(self, in_dict, name=''):
-        self.name = name
-
+    def __init__(self, in_dict):
         in_dict = in_dict.copy()
-
         for key in in_dict.keys():
-            if key == 'name':
-                raise NameError(f"Cannot use key 'name'.")
             if isinstance(in_dict[key], dict):
-                in_dict[key] = Namespacify(in_dict[key], name=key)
+                in_dict[key] = Namespacify(in_dict[key])
 
         super().__init__(in_dict)
-
-    def with_name_from_keys(self, *keys, prefix='', suffix='', uppercase=True):
-        if not keys:
-            obj = ''
-        else:
-            obj = self
-            for j, key in enumerate(keys):
-                try:
-                    obj = obj[key]
-                except (KeyError, TypeError):
-                    raise KeyError(f'Nested value {"->".join(keys[:j])} does not exist.')
-
-            if isinstance(obj, (dict, UserDict)):
-                raise KeyError(f'Nested value {"->".join(keys)} is dict-like, should be str, int, etc.')
-
-            if uppercase:
-                obj = obj.upper()
-
-        self.name = f'{prefix}{obj}{suffix}'
-
-        return self
 
     def update(self, *args, **kwargs):
         return nested_dict_update(self, *args, nest_namespacify=True, **kwargs)
 
     def pprint(self, indent=0, log_func=None, _recur=False):
         log_block = ''
-        name = self.name if self.name else 'config'
-
-        log_block += "{}{}:".format(' ' * indent, name)
-
-        indent += 4
-
         for k, v in self.items():
-            if k == "name":
-                continue
             if isinstance(v, Namespacify):
-                log_block += f'\n{v.pprint(indent, _recur=True)}'
+                log_block += f'\n{v.pprint(indent+4, _recur=True)}'
             else:
                 log_block+= f'\n{" " * indent}{k}: {v}'
 
@@ -93,7 +59,7 @@ class Namespacify(UserDict):
                     if subint:
                         intersection[k] = subint
 
-        return Namespacify(intersection, name=self.name if self.name == other.name else '')
+        return Namespacify(intersection)
 
     def symmetric_difference(self, other):
         """
@@ -136,7 +102,7 @@ class Namespacify(UserDict):
                 else:
                     diff[k] = self[k]
 
-        return Namespacify(diff, name=self.name)
+        return Namespacify(diff)
 
     def difference(self, other):
         """
@@ -166,7 +132,7 @@ class Namespacify(UserDict):
                 else:
                     diff[k] = v
 
-        return Namespacify(diff, name=self.name)
+        return Namespacify(diff)
 
     def serialize(self, stream=None):
         return yaml.safe_dump(self, stream=stream)
@@ -234,7 +200,7 @@ class Namespacify(UserDict):
         return self.difference(other)
 
     def __deepcopy__(self, memo=None):
-        return Namespacify(self.to_dict(), self.name)
+        return Namespacify(self.to_dict())
 
 
 def nested_dict_update(nested_dict, *args, nest_namespacify=False, **kwargs):
@@ -255,7 +221,7 @@ def nested_dict_update(nested_dict, *args, nest_namespacify=False, **kwargs):
                     nested_dict[k], v, nest_namespacify=(nest_namespacify or isinstance(nested_dict[k], Namespacify))
                 )
             else:
-                nested_dict[k] = Namespacify(v, name=k) if nest_namespacify else v
+                nested_dict[k] = Namespacify(v) if nest_namespacify else v
         else:
             nested_dict[k] = v
 
