@@ -25,13 +25,11 @@ NESTED_CONTENTS = {
 class TestSimpleNamespacify:
     def test_empty(self):
         namespacify = Namespacify({})
-        assert namespacify.name == ''
         assert len(namespacify) == 0
         assert namespacify.to_dict() == {}
 
     def test_nonempty_name(self):
-        namespacify = Namespacify({}, name='name')
-        assert namespacify.name == 'name'
+        namespacify = Namespacify({})
         assert len(namespacify) == 0
         assert namespacify.to_dict() == {}
 
@@ -46,26 +44,12 @@ class TestSimpleNamespacify:
 
         assert namespacify.to_dict() == CONTENTS
 
-    def test_with_name_from_keys(self):
-        namespacify = Namespacify(CONTENTS).with_name_from_keys('car')
-
-        assert namespacify.name == 'vroom'.upper()
-
-    def test_with_name_from_keys_bad_key(self):
-        namespacify = Namespacify(CONTENTS)
-        with pytest.raises(KeyError):
-            _ = namespacify.with_name_from_keys('jeep')
-
-    def test_with_name_from_keys_too_many_keys(self):
-        namespacify = Namespacify(CONTENTS)
-        with pytest.raises(KeyError):
-            _ = namespacify.with_name_from_keys('car', 'jeep')
-
-    def test_name_key_raises_name_error(self):
+    def test_name_key(self):
+        # Holdover from when 'name' was not allowed as a key
         contents = CONTENTS.copy()
         contents['name'] = 'jeep'
-        with pytest.raises(NameError):
-            _ = Namespacify(contents)
+        namespacify = Namespacify(contents)
+        assert namespacify['name'] == 'jeep'
 
     def test_serialize(self):
         namespacify = Namespacify(CONTENTS)
