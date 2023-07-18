@@ -2,12 +2,12 @@ from pathlib import Path
 from setuptools import setup, find_packages
 
 DESCRIPTION = 'A yaml-based configuration for reproducible python experiments.'
-VERSION = '0.21'
+VERSION = '0.22'
 MAINTAINER = 'Avishai Halev'
 MAINTAINER_EMAIL = 'avishaihalev@gmail.com'
 LICENSE = 'MIT License'
 PROJECT_URLS = {
-    'Source Code': 'https://github.com/ahalev/experiment-config'
+    'Source Code': f'https://github.com/ahalev/experiment-config/tree/v{VERSION}'
 }
 EXTRAS = {
     'dev': ['pytest']
