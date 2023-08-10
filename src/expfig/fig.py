@@ -160,6 +160,9 @@ class Config(Namespacify):
         else:
             _type = type(default_val)
 
+        if _type == bool:
+            _type = str2bool
+
         arg.update({'default': default_val, 'type': _type})
 
         return arg
@@ -239,3 +242,14 @@ def restructure_arguments(arguments):
         nested_dict_update(restructured, update_with)
 
     return restructured
+
+
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
