@@ -16,13 +16,18 @@ def nest(arguments, delimiter='.'):
     return restructured
 
 
-def unnest(nested, delimiter='.', _key_stack=''):
+def unnest(nested, delimiter='.', levels=None, *, _key_stack=()):
+    if levels is None:
+        levels = depth(nested) + 1
+    elif levels < 0:
+        levels = depth(nested) + levels
+
     flat = {}
     for k, v in nested.items():
-        flat_key = delimiter.join([_key_stack, k]) if _key_stack else k
-        if pd.api.types.is_dict_like(v):
-            flat.update(unnest(v, delimiter, flat_key))
+        if pd.api.types.is_dict_like(v) and len(_key_stack) < levels - 1:
+            flat.update(unnest(v, delimiter, levels=levels, _key_stack=[*_key_stack, k]))
         else:
+            flat_key = delimiter.join([*_key_stack, k])
             flat[flat_key] = v
 
     return flat
