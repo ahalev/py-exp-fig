@@ -1,3 +1,4 @@
 from .logging import make_sequential_log_dir, get_logger
-from .namespacify import Namespacify, nested_dict_update
+from .functions import nested_dict_update
+from .namespacify import Namespacify
 from .fig import Config

@@ -5,6 +5,8 @@ import yaml
 from collections import UserDict
 from logging import getLogger
 
+from . import nested_dict_update
+from .functions import unnest
 from .logging import make_sequential_log_dir
 
 yaml.SafeDumper.add_multi_representer(UserDict, yaml.SafeDumper.represent_dict)
@@ -216,26 +218,3 @@ class Namespacify(UserDict):
         return Namespacify(self.to_dict())
 
 
-def nested_dict_update(nested_dict, *args, nest_namespacify=False, **kwargs):
-    if args:
-        if len(args) != 1 or not isinstance(args[0], (dict, UserDict)):
-            raise TypeError('Invalid arguments')
-        elif kwargs:
-            raise TypeError('Cannot pass both args and kwargs.')
-
-        d = args[0]
-    else:
-        d = kwargs
-
-    for k, v in d.items():
-        if isinstance(v, (dict, UserDict)):
-            if k in nested_dict:
-                nested_dict_update(
-                    nested_dict[k], v, nest_namespacify=(nest_namespacify or isinstance(nested_dict[k], Namespacify))
-                )
-            else:
-                nested_dict[k] = Namespacify(v) if nest_namespacify else v
-        else:
-            nested_dict[k] = v
-
-    return nested_dict
