@@ -194,3 +194,29 @@ class TestNestNamespacify:
         assert series.loc['jeep'].equals(pd.Series(CONTENTS))
         assert series.loc['truck'].equals(pd.Series(NESTED_CONTENTS['truck']))
         assert series.loc[pd.IndexSlice[:, 'car']].equals(pd.Series(['vroom', 'skirt'], index=['jeep', 'truck']))
+
+    def test_setitem_tuple(self):
+        ns = Namespacify(NESTED_CONTENTS)
+        ns[('truck', 'axles')] = 32
+
+        assert ns['truck']['axles'] == 32
+        assert isinstance(ns['truck'], Namespacify)
+
+    def test_setitem_missing(self):
+        ns = Namespacify(NESTED_CONTENTS)
+        ns['bike'] = {'brand': 'honda', 'wheels': 2}
+
+        assert ns['bike']['brand'] == 'honda'
+        assert ns['bike']['wheels'] == 2
+
+        assert isinstance(ns['bike'], Namespacify)
+
+    def test_setitem_missing_tuple(self):
+        ns = Namespacify(NESTED_CONTENTS)
+        ns[('bike', 'brand')] = 'honda'
+        ns[('bike', 'wheels')] = 2
+
+        assert ns['bike']['brand'] == 'honda'
+        assert ns['bike']['wheels'] == 2
+
+        assert isinstance(ns['bike'], Namespacify)
