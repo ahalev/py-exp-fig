@@ -1,3 +1,4 @@
+import functools
 import pandas as pd
 import yaml
 
@@ -169,6 +170,18 @@ class Namespacify(UserDict):
             return out[item[1:]]
 
         return super().__getitem__(item)
+
+    def __setitem__(self, key, value):
+        if isinstance(key, tuple):
+            nested_update = functools.reduce(lambda val, k: {k: val}, reversed(key), value)
+            nested_dict_update(self, nested_update, nest_namespacify=True)
+
+        elif isinstance(value, dict):
+            nested_dict_update(self, {key: value}, nest_namespacify=True)
+
+        else:
+            super().__setitem__(key, value)
+
 
     def __getattr__(self, item):
         if item == 'data':
