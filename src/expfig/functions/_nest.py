@@ -1,22 +1,21 @@
-import functools
 import pandas as pd
 from collections import UserDict
 
 
-def nest(arguments, delimiter='.'):
+def unflatten(arguments, delimiter='.'):
     if set(arguments.keys()) == {''}:
         return arguments['']
 
     restructured = {}
     for key, value in arguments.items():
         top_key, _, bottom_keys = key.partition(delimiter)
-        update_with = {top_key: nest({bottom_keys: value})}
+        update_with = {top_key: unflatten({bottom_keys: value})}
         nested_dict_update(restructured, update_with)
 
     return restructured
 
 
-def unnest(nested, delimiter='.', levels=None, *, _key_stack=()):
+def flatten(nested, delimiter='.', levels=None, *, _key_stack=()):
     if levels is None:
         levels = depth(nested) + 1
 
@@ -26,7 +25,7 @@ def unnest(nested, delimiter='.', levels=None, *, _key_stack=()):
             (levels >= 0 and len(_key_stack) < levels - 1) or
             (levels < 0 and depth(v) > -1 * levels)
         ):
-            flat.update(unnest(v, delimiter, levels=levels, _key_stack=[*_key_stack, k]))
+            flat.update(flatten(v, delimiter, levels=levels, _key_stack=[*_key_stack, k]))
         else:
             flat_key = delimiter.join([*_key_stack, k])
             flat[flat_key] = v

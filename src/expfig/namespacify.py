@@ -6,7 +6,7 @@ from collections import UserDict
 from logging import getLogger
 
 from . import nested_dict_update
-from .functions import depth, unnest
+from .functions import depth, flatten
 from .logging import make_sequential_log_dir
 
 yaml.SafeDumper.add_multi_representer(UserDict, yaml.SafeDumper.represent_dict)
@@ -54,7 +54,7 @@ class Namespacify(UserDict):
         return series
 
     def flatten(self, delimiter='.', levels=None):
-        return unnest(self, delimiter=delimiter, levels=levels)
+        return flatten(self, delimiter=delimiter, levels=levels)
 
     def intersection(self, other):
         intersection = {}

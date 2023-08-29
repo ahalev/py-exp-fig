@@ -1,6 +1,6 @@
 import pytest
 
-from expfig.functions import nest, unnest
+from expfig.functions import unflatten, flatten
 
 CONTENTS = {
     'car': 'vroom',
@@ -11,13 +11,13 @@ CONTENTS = {
 
 class TestNest:
     def test_no_nest(self):
-        restructured = nest(CONTENTS)
+        restructured = unflatten(CONTENTS)
 
         assert restructured == CONTENTS
 
     def test_single_key(self):
         contents = {'jeep.car': 'vroom'}
-        restructured = nest(contents)
+        restructured = unflatten(contents)
         assert restructured == {'jeep': {'car': 'vroom'}}
 
     def test_two_toplevel_keys(self):
@@ -30,7 +30,7 @@ class TestNest:
             'truck': {'sound': 'skirt'}
         }
 
-        restructured = nest(contents)
+        restructured = unflatten(contents)
         assert restructured == expected
 
     def test_two_inner_keys(self):
@@ -43,7 +43,7 @@ class TestNest:
             'wheels': 4
         }}
 
-        restructured = nest(contents)
+        restructured = unflatten(contents)
         assert restructured == expected
 
     def test_combination(self):
@@ -62,21 +62,21 @@ class TestNest:
             'porsche': 'stunning'
         }
 
-        restructured = nest(contents)
+        restructured = unflatten(contents)
         assert restructured == expected
 
 
 class TestUnnest:
     def test_single_key(self):
         nested = {'jeep': {'car': 'vroom'}}
-        unnested = unnest(nested)
+        unnested = flatten(nested)
         expected_contents = {'jeep.car': 'vroom'}
         assert unnested == expected_contents
 
     def test_single_key_namespacify(self):
         from expfig import Namespacify
         nested = Namespacify({'jeep': {'car': 'vroom'}})
-        unnested = unnest(nested)
+        unnested = flatten(nested)
         expected_contents = {'jeep.car': 'vroom'}
         assert unnested == expected_contents
 
@@ -91,7 +91,7 @@ class TestUnnest:
             'truck.sound': 'skirt'
         }
 
-        flat = unnest(contents)
+        flat = flatten(contents)
         assert flat == expected
 
     def test_two_inner_keys(self):
@@ -105,7 +105,7 @@ class TestUnnest:
             'jeep.wheels': 4
         }
 
-        flat = unnest(contents)
+        flat = flatten(contents)
         assert flat == expected
 
     def test_combination(self):
@@ -125,7 +125,7 @@ class TestUnnest:
             'porsche': 'stunning'
         }
 
-        flat = unnest(contents)
+        flat = flatten(contents)
         assert flat == expected
 
     def test_combination_max_levels_2(self):
@@ -144,7 +144,7 @@ class TestUnnest:
             'porsche': 'stunning'
         }
 
-        flat = unnest(contents, levels=2)
+        flat = flatten(contents, levels=2)
         assert flat == expected
 
     def test_combination_max_levels_neg_1(self):
@@ -162,5 +162,5 @@ class TestUnnest:
             'porsche': 'stunning'
         }
 
-        flat = unnest(contents, levels=-1)
+        flat = flatten(contents, levels=-1)
         assert flat == expected
