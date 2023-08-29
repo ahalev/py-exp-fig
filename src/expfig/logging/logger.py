@@ -23,7 +23,7 @@ def get_logger(level=logging.DEBUG, log_file=None):
 
         if not check_existing_handler(file_handler, logger.handlers):
             logger.addHandler(file_handler)
-            logger.info(f'Logging to file: {log_file}')
+            logger.info(f'Logging to file: {os.path.abspath(log_file)}')
 
     return logger
 
