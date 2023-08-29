@@ -28,6 +28,12 @@ def unnest(nested, delimiter='.', _key_stack=''):
     return flat
 
 
+def depth(d):
+    if pd.api.types.is_dict_like(d):
+        return 1 + (max(map(depth, d.values())) if d else 0)
+    return 0
+
+
 def nested_dict_update(nested_dict, *args, nest_namespacify=False, **kwargs):
     from expfig import Namespacify  # prevent circular import
 

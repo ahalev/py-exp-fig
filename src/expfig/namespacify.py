@@ -6,7 +6,7 @@ from collections import UserDict
 from logging import getLogger
 
 from . import nested_dict_update
-from .functions import unnest
+from .functions import depth, unnest
 from .logging import make_sequential_log_dir
 
 yaml.SafeDumper.add_multi_representer(UserDict, yaml.SafeDumper.represent_dict)
@@ -40,6 +40,9 @@ class Namespacify(UserDict):
                 log_func(log_block)
 
         return log_block
+
+    def depth(self):
+        return depth(self)
 
     def to_dict(self):
         return {k: v.to_dict() if isinstance(v, Namespacify) else (v.copy() if hasattr(v, 'copy') else v)
