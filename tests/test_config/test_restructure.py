@@ -146,3 +146,21 @@ class TestUnnest:
 
         flat = unnest(contents, levels=2)
         assert flat == expected
+
+    def test_combination_max_levels_neg_1(self):
+        contents = {
+            'jeep': {'sound': 'vroom', 'wheels': 4},
+            'truck': {'sound': 'skirt', 'wheels': 18, 'axles': {'length': 32, 'width': 4}},
+            'porsche': 'stunning'
+        }
+
+        expected = {
+            'jeep': {'sound': 'vroom', 'wheels': 4},
+            'truck.sound': 'skirt',
+            'truck.wheels': 18,
+            'truck.axles': {'length': 32, 'width': 4},
+            'porsche': 'stunning'
+        }
+
+        flat = unnest(contents, levels=-1)
+        assert flat == expected
