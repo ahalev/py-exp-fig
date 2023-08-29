@@ -53,8 +53,8 @@ class Namespacify(UserDict):
         series.index = pd.MultiIndex.from_tuples([x.split('.') for x in series.index])
         return series
 
-    def flatten(self, delimiter='.'):
-        return unnest(self, delimiter=delimiter)
+    def flatten(self, delimiter='.', levels=None):
+        return unnest(self, delimiter=delimiter, levels=levels)
 
     def intersection(self, other):
         intersection = {}
