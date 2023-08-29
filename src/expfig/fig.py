@@ -144,6 +144,9 @@ class Config(Namespacify):
             if isinstance(v, (dict, UserDict)) and len(v):
                 args.update(self._get_arguments(key=new_key, d=v))
             else:
+                if '-' in new_key:
+                    raise NameError(f"Invalid character '-' in key '{new_key}'.")
+
                 args[new_key] = self._collect_argument(v)
 
         return args
