@@ -179,7 +179,7 @@ class Config(Namespacify):
             _type = str
 
             if len(_types):
-                warn('Collecting argument with non-unique types in default value.'
+                warn('Collecting argument with non-unique types in default value. '
                      'Collected values will be str.')
 
         return _type
