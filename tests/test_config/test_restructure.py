@@ -1,6 +1,6 @@
 import pytest
 
-from expfig.fig import restructure_arguments
+from expfig.functions import nest, unnest
 
 CONTENTS = {
     'car': 'vroom',

@@ -11,6 +11,7 @@ from pathlib import Path
 from warnings import warn
 
 from . import Namespacify, nested_dict_update
+from .functions import nest
 from .logging import get_logger
 
 
@@ -65,7 +66,7 @@ class Config(Namespacify):
         args_dict = {k: v if v != 'null' else None for k, v in parsed_args[0].__dict__.items()}
 
         args_dict = self._extract_verbosity(args_dict)
-        restructured = restructure_arguments(args_dict)
+        restructured = nest(args_dict)
 
         self._check_restructured(restructured, self.default_config)
         return restructured
@@ -112,7 +113,7 @@ class Config(Namespacify):
             if any(isinstance(v, dict) for v in config.values()):
                 raise ValueError('Cannot combine nested dict config arguments with "." deliminated arguments.')
 
-            config = restructure_arguments(config)
+            config = nest(config)
 
         return config
 
@@ -232,19 +233,6 @@ def _config_from_yaml(file_path):
                          f'{type(loaded_contents).__name__}, should be dict.')
 
     return loaded_contents
-
-
-def restructure_arguments(arguments):
-    if set(arguments.keys()) == {''}:
-        return arguments['']
-
-    restructured = {}
-    for key, value in arguments.items():
-        top_key, _, bottom_keys = key.partition('.')
-        update_with = {top_key: restructure_arguments({bottom_keys: value})}
-        nested_dict_update(restructured, update_with)
-
-    return restructured
 
 
 def str2bool(v):
