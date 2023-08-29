@@ -19,12 +19,13 @@ def nest(arguments, delimiter='.'):
 def unnest(nested, delimiter='.', levels=None, *, _key_stack=()):
     if levels is None:
         levels = depth(nested) + 1
-    elif levels < 0:
-        levels = depth(nested) + levels
 
     flat = {}
     for k, v in nested.items():
-        if pd.api.types.is_dict_like(v) and len(_key_stack) < levels - 1:
+        if pd.api.types.is_dict_like(v) and (
+            (levels >= 0 and len(_key_stack) < levels - 1) or
+            (levels < 0 and depth(v) > -1 * levels)
+        ):
             flat.update(unnest(v, delimiter, levels=levels, _key_stack=[*_key_stack, k]))
         else:
             flat_key = delimiter.join([*_key_stack, k])
