@@ -1,4 +1,6 @@
 import functools
+
+import numpy as np
 import pandas as pd
 import yaml
 
@@ -61,7 +63,7 @@ class Namespacify(UserDict):
 
         for k, v in self.items():
             if k in other:
-                if other[k] == v:
+                if equal(other[k], v):
                     intersection[k] = v
                 elif isinstance(v, Namespacify) and isinstance(other[k], Namespacify):
                     subint = v.intersection(other[k])
@@ -105,9 +107,9 @@ class Namespacify(UserDict):
                 diff[k] = self[k]
                 continue
 
-            elif self[k] != other[k]:
+            elif not equal(self[k], other[k]):
                 if isinstance(self[k], Namespacify):
-                    diff[k] = self[k].__xor__(other[k])
+                    diff[k] = self[k].symmetric_difference(other[k])
                 else:
                     diff[k] = self[k]
 
@@ -135,7 +137,7 @@ class Namespacify(UserDict):
         for k, v in self.items():
             if k not in other:
                 diff[k] = v
-            elif v != other[k]:
+            elif not equal(v, other[k]):
                 if isinstance(v, Namespacify):
                     diff[k] = v.difference(other[k])
                 else:
