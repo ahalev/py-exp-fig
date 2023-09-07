@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 import pandas as pd
 import yaml
@@ -220,3 +221,25 @@ class TestNestNamespacify:
         assert ns['bike']['wheels'] == 2
 
         assert isinstance(ns['bike'], Namespacify)
+
+
+class TestSymmetricDifference:
+    def test_empty(self):
+        ns1 = Namespacify(CONTENTS)
+        ns2 = Namespacify(CONTENTS)
+
+        sym_diff = ns1.symmetric_difference(ns2)
+        assert len(sym_diff) == 0
+
+    def test_simple(self):
+        pass
+
+    def test_arr_like(self):
+        ns1 = Namespacify(CONTENTS)
+        ns2 = Namespacify(CONTENTS)
+
+        ns1['car'] = pd.Series(CONTENTS)
+
+        sym_diff = ns1.symmetric_difference(ns2)
+
+        assert np.array_equal(sym_diff['car'] , ns1['car'])
