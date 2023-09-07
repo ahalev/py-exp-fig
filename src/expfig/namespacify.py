@@ -224,3 +224,8 @@ class Namespacify(UserDict):
         return Namespacify(self.to_dict())
 
 
+def equal(a, b):
+    try:
+        return bool(a == b)
+    except ValueError:
+        return np.array_equal(a, b)
