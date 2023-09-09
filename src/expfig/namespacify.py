@@ -165,7 +165,12 @@ class Namespacify(UserDict):
 
     def __dir__(self):
         rv = set(super().__dir__())
-        rv = rv | set(self.keys())
+
+        try:
+            rv = rv | set(self.keys())
+        except RuntimeError:
+            pass
+
         return sorted(rv)
 
     def __getitem__(self, item):
