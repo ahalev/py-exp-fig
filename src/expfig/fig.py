@@ -12,6 +12,7 @@ from warnings import warn
 
 from . import Namespacify, nested_dict_update
 from .functions import unflatten
+from .functions._parse import str2bool, ListType, ListAction
 from .logging import get_logger
 
 
@@ -179,6 +180,7 @@ class Config(Namespacify):
 
         if pd.api.types.is_list_like(default_val):
             arg['nargs'] = '+'
+            arg['action'] = ListAction
             _type = self._get_list_like_type(default_val)
 
         elif not default_val and not isinstance(default_val, (float, int, bool)):
@@ -202,10 +204,11 @@ class Config(Namespacify):
             _type = str
 
             if len(_types):
-                warn('Collecting argument with non-unique types in default value. '
+                warn('Collecting list-like argument with non-unique types in default value or empty default value. '
                      'Collected values will be str.')
 
-        return _type
+        return ListType(_type)
+
 
     def serialize_to_dir(self, log_dir, fname='config.yaml', use_existing_dir=False, with_default=False):
         log_dir = super().serialize_to_dir(log_dir, fname=fname, use_existing_dir=use_existing_dir)
@@ -257,12 +260,3 @@ def _config_from_yaml(file_path):
     return loaded_contents
 
 
-def str2bool(v):
-    if isinstance(v, bool):
-        return v
-    if v.lower() in ('yes', 'true', 't', 'y', '1'):
-        return True
-    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
-        return False
-    else:
-        raise argparse.ArgumentTypeError('Boolean value expected.')
