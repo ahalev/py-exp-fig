@@ -52,11 +52,12 @@ class Config(Namespacify):
         # First we parse any --config arguments and load those
         # Then we can override them with any other passed values.
         base_config = deepcopy(self.default_config)
-        config_files, other_args = self._create_config_file_parser().parse_known_args()
 
+        config_file_args, other_args = self._split_config_file_args()
+        config_files = self._create_config_file_parser().parse_args(args=config_file_args)
         self.update_with_configs(config_files.config, base_config)
 
-        parsed_args = self._create_parser(default=base_config).parse_known_args(other_args)
+        parsed_args = self._create_parser(default=base_config).parse_known_args(args=other_args)
 
         if len(parsed_args[1]):
             valid_args = "\n\t\t".join(sorted(parsed_args[0].__dict__.keys()))
@@ -69,6 +70,28 @@ class Config(Namespacify):
 
         self._check_restructured(restructured, self.default_config)
         return restructured
+
+    def _split_config_file_args(self):
+        try:
+            config_key_idx = sys.argv.index('--config')
+        except ValueError:
+            return [], sys.argv[1:]
+
+        config_args = []
+        other_args = []
+
+        next_optional_arg = [j for j in range(config_key_idx+1, len(sys.argv)) if '--' in sys.argv[j]][0]
+
+        for j, arg in enumerate(sys.argv[1:], start=1):
+            if config_key_idx <= j < next_optional_arg:
+                config_args.append(arg)
+            else:
+                other_args.append(arg)
+
+        assert set(config_args).union(other_args) == set(sys.argv[1:])
+        assert not set(config_args).intersection(other_args)
+
+        return config_args, other_args
 
     def _create_parser(self, default=None):
         parser = argparse.ArgumentParser(prog='GridRL')
