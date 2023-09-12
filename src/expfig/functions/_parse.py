@@ -13,6 +13,12 @@ def str2bool(v):
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
+def str2none(v):
+    if v == 'null':
+        return None
+    return v
+
+
 class ListType:
     def __init__(self, _type):
         self.type = _type
