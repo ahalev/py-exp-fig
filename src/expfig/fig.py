@@ -64,6 +64,7 @@ class Config(Namespacify):
             valid_args = "\n\t\t".join(sorted(parsed_args[0].__dict__.keys()))
             warn(f'Unrecognized arguments {parsed_args[1]}.\n\tValid arguments:\n\t\t{valid_args}')
 
+        # TODO (ahalev) deprecate, this should be handled by str2None
         args_dict = {k: v if v != 'null' else None for k, v in parsed_args[0].__dict__.items()}
 
         args_dict = self._extract_verbosity(args_dict)
