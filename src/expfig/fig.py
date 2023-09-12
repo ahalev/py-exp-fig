@@ -12,7 +12,7 @@ from warnings import warn
 
 from . import Namespacify, nested_dict_update
 from .functions import unflatten
-from .functions._parse import str2bool, ListType, ListAction
+from .functions._parse import str2bool, str2none, ListType, ListAction
 from .logging import get_logger
 
 
@@ -190,6 +190,8 @@ class Config(Namespacify):
 
         if _type == bool:
             _type = str2bool
+        elif _type == str:
+            _type = str2none
 
         arg.update({'default': default_val, 'type': _type})
 
@@ -206,6 +208,9 @@ class Config(Namespacify):
             if len(_types):
                 warn('Collecting list-like argument with non-unique types in default value or empty default value. '
                      'Collected values will be str.')
+
+        if _type == str:
+            _type = str2none
 
         return ListType(_type)
 
