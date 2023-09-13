@@ -24,15 +24,17 @@ class ListType:
         self.type = _type
 
     def __call__(self, value):
-        if self.type == str:
+        if self.type == str2none:
             literal = self.str_eval(value)
+            type_check = str
         else:
             try:
                 return self.type(value)
             except ValueError:
                 literal = literal_eval(value)
+                type_check = self.type
 
-        if all(isinstance(v, self.type) for v in literal):
+        if all(isinstance(v, type_check) for v in literal):
             return literal
 
         raise argparse.ArgumentTypeError(f'Invalid value(s) for type {self.type}: {value}')
