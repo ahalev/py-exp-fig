@@ -81,8 +81,11 @@ class Config(Namespacify):
 
         config_args = []
         other_args = []
-
-        next_optional_arg = [j for j in range(config_key_idx+1, len(sys.argv)) if '--' in sys.argv[j]][0]
+        try:
+            next_optional_arg = [j for j in range(config_key_idx+1, len(sys.argv)) if '--' in sys.argv[j]][0]
+        except IndexError:
+            # no optional args following config arguments
+            next_optional_arg = float('inf')
 
         for j, arg in enumerate(sys.argv[1:], start=1):
             if config_key_idx <= j < next_optional_arg:
