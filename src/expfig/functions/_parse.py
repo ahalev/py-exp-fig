@@ -25,8 +25,9 @@ class ListType:
 
     def __call__(self, value):
         if self.type == str2none:
-            literal = self.str_eval(value)
-            type_check = str
+            literal = self.str2none_eval(value)
+            type_check = (str, type(None))
+
         else:
             try:
                 return self.type(value)
@@ -34,17 +35,19 @@ class ListType:
                 literal = literal_eval(value)
                 type_check = self.type
 
-        if all(isinstance(v, type_check) for v in literal):
+        if isinstance(literal, list) and all(isinstance(v, type_check) for v in literal) or \
+                isinstance(literal, type_check):
             return literal
 
         raise argparse.ArgumentTypeError(f'Invalid value(s) for type {self.type}: {value}')
 
     @staticmethod
-    def str_eval(value):
+    def str2none_eval(value):
         if value.startswith('[') and value.endswith(']'):
-            return literal_eval(value)
+            _value = literal_eval(value)
+            return [str2none(v) for v in _value]
 
-        return value
+        return str2none(value)
 
 
 class ListAction(argparse._StoreAction):
