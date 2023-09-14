@@ -242,11 +242,11 @@ class TestListRead:
 @contextlib.contextmanager
 def tempfile(mode='w+b', buffering=-1, encoding=None,
              newline=None, suffix=None, prefix=None,
-             dir=None, *, errors=None):
+             dir=None):
 
     file = _tempfile.NamedTemporaryFile(mode=mode, buffering=buffering, encoding=encoding,
                                         newline=newline, suffix=suffix, prefix=prefix,
-                                        dir=dir, delete=False, errors=errors)
+                                        dir=dir, delete=False)
     try:
         yield file
     finally:
