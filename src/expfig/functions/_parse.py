@@ -20,6 +20,9 @@ def str2none(v):
 
 
 class ListType:
+    __name__ = 'ListType'
+    # TODO (ahalev) make this a metaclass, inherit from type and deprecate this class attr
+
     def __init__(self, _type):
         self.type = _type
 
