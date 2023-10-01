@@ -28,20 +28,28 @@ class ListType:
             literal = value
         elif self.type == str2none:
             literal = self.str2none_eval(value)
-            type_check = (str, type(None))
-
         else:
             try:
                 return self.type(value)
             except ValueError:
                 literal = literal_eval(value)
-                type_check = self.type
 
-        if isinstance(literal, list) and all(isinstance(v, type_check) for v in literal) or \
-                isinstance(literal, type_check):
-            return literal
+        return self.type_check(literal)
+
+    def type_check(self, value):
+        if isinstance(value, list) and all(isinstance(v, self.types_to_check) for v in value) or \
+                isinstance(value, self.types_to_check):
+            return value
 
         raise argparse.ArgumentTypeError(f'Invalid value(s) for type {self.type}: {value}')
+
+    @property
+    def types_to_check(self):
+        if self.type == str2none:
+            return str, type(None)
+
+        return self.type
+
 
     @staticmethod
     def str2none_eval(value):
