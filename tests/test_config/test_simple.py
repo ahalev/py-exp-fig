@@ -5,6 +5,7 @@ import pytest
 import tempfile as _tempfile
 import yaml
 
+from copy import deepcopy
 from unittest import mock
 from expfig import Config
 
@@ -165,6 +166,33 @@ class TestListRead:
 
         assert config.brands == ['toyota', None]
 
+    @mock_sys_argv('--truck.axles', '7.5')
+    def test_float_default_int(self):
+
+        with pytest.raises(SystemExit):
+            _ = Config(default=NESTED_CONTENTS)
+
+    @mock_sys_argv('--truck.axles', '7.5')
+    def test_float_default_float(self):
+
+        default_config = deepcopy(NESTED_CONTENTS)
+        default_config['truck']['axles'] = 6.0
+
+        config = Config(default=default_config)
+
+        assert config.truck.axles == 7.5
+
+    @mock_sys_argv('--truck.axles', '8.0')
+    def test_float_could_be_int_default_float(self):
+
+        default_config = deepcopy(NESTED_CONTENTS)
+        default_config['truck']['axles'] = 6.0
+
+        config = Config(default=default_config)
+
+        assert config.truck.axles == 8
+        assert isinstance(config.truck.axles, float)
+
 
 class TestConfigFile:
     def test_config_file(self):
@@ -238,6 +266,38 @@ class TestConfigFile:
             assert config.dealer == 'michael-jordan-honda'
             assert config.truck.axles == 128
             assert config.truck.car == 'skirt'
+
+    def test_config_file_type_mismatch(self):
+        yaml_dump = {'truck': {'axles': 128}}
+
+        default_config = deepcopy(NESTED_CONTENTS)
+        default_config['truck']['axles'] = 6.0
+
+        with tempfile(suffix='.yaml', mode='w') as temp_yaml, \
+                mock_sys_argv('--config', temp_yaml.name):
+
+            yaml.safe_dump(yaml_dump, temp_yaml)
+
+            config = Config(default=default_config)
+
+            assert config.truck.axles == 128
+            assert isinstance(config.truck.axles, float)
+
+    def test_config_file_explicit_arg_type_mismatch(self):
+        yaml_dump = {'truck': {'axles': 128}}
+
+        default_config = deepcopy(NESTED_CONTENTS)
+        default_config['truck']['axles'] = 6.0
+
+        with tempfile(suffix='.yaml', mode='w') as temp_yaml, \
+                mock_sys_argv('--config', temp_yaml.name, '--truck.axles', '7.5'):
+
+            yaml.safe_dump(yaml_dump, temp_yaml)
+
+            config = Config(default=default_config)
+
+            assert config.truck.axles == 7.5
+            assert isinstance(config.truck.axles, float)
 
 
 @contextlib.contextmanager
