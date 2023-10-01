@@ -175,29 +175,36 @@ class Config(Namespacify):
                 if '-' in new_key:
                     raise NameError(f"Invalid character '-' in key '{new_key}'.")
 
-                args[new_key] = self._collect_argument(v)
+                base_default = self.default_config.get(tuple(new_key.split('.')), v)
+                args[new_key] = self._collect_argument(v, base_default)
 
         return args
 
-    def _collect_argument(self, default_val):
+    def _collect_argument(self, default_val, base_default):
         arg = {}
 
-        if pd.api.types.is_list_like(default_val):
+        if pd.api.types.is_list_like(base_default):
             arg['nargs'] = '+'
             arg['action'] = ListAction
-            _type = self._get_list_like_type(default_val)
+            _type = self._get_list_like_type(base_default)
 
-        elif not default_val and not isinstance(default_val, (float, int, bool)):
+        elif not base_default and not isinstance(base_default, (float, int, bool)):
             _type = str
         else:
-            _type = type(default_val)
+            _type = type(base_default)
 
         if _type == bool:
             _type = str2bool
         elif _type == str:
             _type = str2none
 
-        arg.update({'default': default_val, 'type': _type})
+        try:
+            default = _type(default_val)
+        except Exception as e:
+            raise TypeError(f"Value '{default_val}' read from yaml file cannot be case to type '{_type.__name__}' "
+                            f"of base config value.")
+
+        arg.update({'default': default, 'type': _type})
 
         return arg
 
