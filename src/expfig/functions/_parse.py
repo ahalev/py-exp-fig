@@ -24,7 +24,9 @@ class ListType:
         self.type = _type
 
     def __call__(self, value):
-        if self.type == str2none:
+        if isinstance(value, list):
+            literal = value
+        elif self.type == str2none:
             literal = self.str2none_eval(value)
             type_check = (str, type(None))
 
