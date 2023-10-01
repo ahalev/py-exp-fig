@@ -64,78 +64,6 @@ class TestSimpleConfig:
         assert config.dealer == 'michael-jordan-toyota'
         assert config.truck.car == 'bing'
 
-    def test_config_file(self):
-        yaml_dump = {'dealer': 'michael-jordan-toyota'}
-
-        with tempfile(suffix='.yaml', mode='w') as temp_yaml, mock_sys_argv('--config', temp_yaml.name):
-            yaml.safe_dump(yaml_dump, temp_yaml)
-            config = Config(default=NESTED_CONTENTS)
-
-            assert config.dealer == 'michael-jordan-toyota'
-            assert config.truck.car == 'skirt'
-
-    def test_multiple_config_file_non_overlap(self):
-        yaml_dump_1 = {'dealer': 'michael-jordan-toyota'}
-        yaml_dump_2 = {'truck': {'axles': 128}}
-
-        with tempfile(suffix='.yaml', mode='w') as temp_yaml_1,\
-                tempfile(suffix='.yaml', mode='w') as temp_yaml_2, \
-                mock_sys_argv('--config', temp_yaml_1.name, temp_yaml_2.name):
-
-            yaml.safe_dump(yaml_dump_1, temp_yaml_1)
-            yaml.safe_dump(yaml_dump_2, temp_yaml_2)
-
-            config = Config(default=NESTED_CONTENTS)
-
-            assert config.dealer == 'michael-jordan-toyota'
-            assert config.truck.axles == 128
-            assert config.truck.car == 'skirt'
-
-    def test_multiple_config_file_overlap(self):
-        yaml_dump_1 = {'dealer': 'michael-jordan-toyota'}
-        yaml_dump_2 = {'truck': {'axles': 128}, 'dealer': 'michael-jordan-honda'}
-
-        with tempfile(suffix='.yaml', mode='w') as temp_yaml_1,\
-                tempfile(suffix='.yaml', mode='w') as temp_yaml_2, \
-                mock_sys_argv('--config', temp_yaml_1.name, temp_yaml_2.name):
-
-            yaml.safe_dump(yaml_dump_1, temp_yaml_1)
-            yaml.safe_dump(yaml_dump_2, temp_yaml_2)
-
-            config = Config(default=NESTED_CONTENTS)
-
-            assert config.dealer == 'michael-jordan-honda'
-            assert config.truck.axles == 128
-            assert config.truck.car == 'skirt'
-
-    def test_config_file_explicit_arg_overlap(self):
-        yaml_dump = {'truck': {'axles': 128}, 'dealer': 'michael-jordan-toyota'}
-
-        with tempfile(suffix='.yaml', mode='w') as temp_yaml, \
-                mock_sys_argv('--config', temp_yaml.name, '--dealer', 'michael-jordan-honda'):
-
-            yaml.safe_dump(yaml_dump, temp_yaml)
-
-            config = Config(default=NESTED_CONTENTS)
-
-            assert config.dealer == 'michael-jordan-honda'
-            assert config.truck.axles == 128
-            assert config.truck.car == 'skirt'
-
-    def test_config_file_explicit_arg_overlap_order_swap(self):
-        yaml_dump = {'truck': {'axles': 128}, 'dealer': 'michael-jordan-toyota'}
-
-        with tempfile(suffix='.yaml', mode='w') as temp_yaml, \
-                mock_sys_argv('--dealer', 'michael-jordan-honda', '--config', temp_yaml.name):
-
-            yaml.safe_dump(yaml_dump, temp_yaml)
-
-            config = Config(default=NESTED_CONTENTS)
-
-            assert config.dealer == 'michael-jordan-honda'
-            assert config.truck.axles == 128
-            assert config.truck.car == 'skirt'
-
     @mock_sys_argv('--truck.car', 'null')
     def test_null_read(self):
         config = Config(default=NESTED_CONTENTS)
@@ -237,6 +165,80 @@ class TestListRead:
         config = Config(default=LIST_CONTENTS)
 
         assert config.brands == ['toyota', None]
+
+
+class TestConfigFile:
+    def test_config_file(self):
+        yaml_dump = {'dealer': 'michael-jordan-toyota'}
+
+        with tempfile(suffix='.yaml', mode='w') as temp_yaml, mock_sys_argv('--config', temp_yaml.name):
+            yaml.safe_dump(yaml_dump, temp_yaml)
+            config = Config(default=NESTED_CONTENTS)
+
+            assert config.dealer == 'michael-jordan-toyota'
+            assert config.truck.car == 'skirt'
+
+    def test_multiple_config_file_non_overlap(self):
+        yaml_dump_1 = {'dealer': 'michael-jordan-toyota'}
+        yaml_dump_2 = {'truck': {'axles': 128}}
+
+        with tempfile(suffix='.yaml', mode='w') as temp_yaml_1,\
+                tempfile(suffix='.yaml', mode='w') as temp_yaml_2, \
+                mock_sys_argv('--config', temp_yaml_1.name, temp_yaml_2.name):
+
+            yaml.safe_dump(yaml_dump_1, temp_yaml_1)
+            yaml.safe_dump(yaml_dump_2, temp_yaml_2)
+
+            config = Config(default=NESTED_CONTENTS)
+
+            assert config.dealer == 'michael-jordan-toyota'
+            assert config.truck.axles == 128
+            assert config.truck.car == 'skirt'
+
+    def test_multiple_config_file_overlap(self):
+        yaml_dump_1 = {'dealer': 'michael-jordan-toyota'}
+        yaml_dump_2 = {'truck': {'axles': 128}, 'dealer': 'michael-jordan-honda'}
+
+        with tempfile(suffix='.yaml', mode='w') as temp_yaml_1,\
+                tempfile(suffix='.yaml', mode='w') as temp_yaml_2, \
+                mock_sys_argv('--config', temp_yaml_1.name, temp_yaml_2.name):
+
+            yaml.safe_dump(yaml_dump_1, temp_yaml_1)
+            yaml.safe_dump(yaml_dump_2, temp_yaml_2)
+
+            config = Config(default=NESTED_CONTENTS)
+
+            assert config.dealer == 'michael-jordan-honda'
+            assert config.truck.axles == 128
+            assert config.truck.car == 'skirt'
+
+    def test_config_file_explicit_arg_overlap(self):
+        yaml_dump = {'truck': {'axles': 128}, 'dealer': 'michael-jordan-toyota'}
+
+        with tempfile(suffix='.yaml', mode='w') as temp_yaml, \
+                mock_sys_argv('--config', temp_yaml.name, '--dealer', 'michael-jordan-honda'):
+
+            yaml.safe_dump(yaml_dump, temp_yaml)
+
+            config = Config(default=NESTED_CONTENTS)
+
+            assert config.dealer == 'michael-jordan-honda'
+            assert config.truck.axles == 128
+            assert config.truck.car == 'skirt'
+
+    def test_config_file_explicit_arg_overlap_order_swap(self):
+        yaml_dump = {'truck': {'axles': 128}, 'dealer': 'michael-jordan-toyota'}
+
+        with tempfile(suffix='.yaml', mode='w') as temp_yaml, \
+                mock_sys_argv('--dealer', 'michael-jordan-honda', '--config', temp_yaml.name):
+
+            yaml.safe_dump(yaml_dump, temp_yaml)
+
+            config = Config(default=NESTED_CONTENTS)
+
+            assert config.dealer == 'michael-jordan-honda'
+            assert config.truck.axles == 128
+            assert config.truck.car == 'skirt'
 
 
 @contextlib.contextmanager
