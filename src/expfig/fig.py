@@ -77,6 +77,21 @@ class Config(Namespacify):
         try:
             config_key_idx = sys.argv.index('--config')
         except ValueError:
+            try:
+                # single string starting with '--config'
+                config_arg_loc = [x.startswith('--config') for x in sys.argv]
+                assert sum(config_arg_loc) == 1
+            except AssertionError:
+                return [], sys.argv[1:]
+            else:
+                config_arg_loc = config_arg_loc.index(True)
+                config_arg = sys.argv[config_arg_loc]
+
+                other_args = sys.argv[1:].copy()
+                other_args.pop(config_arg_loc-1)
+
+                return [config_arg], other_args
+
             return [], sys.argv[1:]
 
         config_args = []
