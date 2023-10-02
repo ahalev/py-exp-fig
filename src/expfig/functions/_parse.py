@@ -53,7 +53,6 @@ class ListType:
 
         return self.type
 
-
     @staticmethod
     def str2none_eval(value):
         if value.startswith('[') and value.endswith(']'):
