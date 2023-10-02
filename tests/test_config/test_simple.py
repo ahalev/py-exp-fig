@@ -299,6 +299,22 @@ class TestConfigFile:
             assert config.truck.axles == 7.5
             assert isinstance(config.truck.axles, float)
 
+    def test_config_file_multiple_single_str(self):
+        yaml_dump_1 = {'dealer': 'michael-jordan-toyota'}
+        yaml_dump_2 = {'truck': {'axles': 128}, 'dealer': 'michael-jordan-honda'}
+
+        with tempfile(suffix='.yaml', mode='w') as temp_yaml_1,\
+                tempfile(suffix='.yaml', mode='w') as temp_yaml_2, \
+                mock_sys_argv(f"--config=['{temp_yaml_1.name}', '{temp_yaml_2.name}']"):
+            yaml.safe_dump(yaml_dump_1, temp_yaml_1)
+            yaml.safe_dump(yaml_dump_2, temp_yaml_2)
+
+            config = Config(default=NESTED_CONTENTS)
+
+            assert config.dealer == 'michael-jordan-honda'
+            assert config.truck.axles == 128
+            assert config.truck.car == 'skirt'
+
 
 @contextlib.contextmanager
 def tempfile(mode='w+b', buffering=-1, encoding=None,
