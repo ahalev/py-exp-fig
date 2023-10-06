@@ -3,3 +3,4 @@ dist/
 examples/**/**logs**/
 **/__pycache__/**
 **egg-info**
+local/
