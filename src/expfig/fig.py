@@ -229,7 +229,6 @@ class Config(Namespacify):
 
             default = default_val
 
-
         arg.update({'default': default, 'type': _type})
 
         return arg
