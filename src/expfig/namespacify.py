@@ -17,11 +17,6 @@ logger = getLogger(__name__)
 
 class Namespacify(UserDict):
     def __init__(self, in_dict):
-        in_dict = in_dict.copy()
-        for key in in_dict.keys():
-            if isinstance(in_dict[key], dict):
-                in_dict[key] = Namespacify(in_dict[key])
-
         super().__init__(in_dict)
 
     def update(self, *args, **kwargs):
