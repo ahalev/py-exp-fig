@@ -20,9 +20,13 @@ DEFAULT_CONFIG_PATH = os.path.join(os.getcwd(), 'default_config.yaml')
 
 
 class Config(Namespacify):
-    def __init__(self, config=None, default=DEFAULT_CONFIG_PATH):
-        self.default_config = DefaultConfig(self._parse_default(config, default))
+    def __init__(self, config=None, default=DEFAULT_CONFIG_PATH, yaml_type_handling='warn'):
+        assert yaml_type_handling in ('ignore', 'warn', 'error'), \
+            "yaml_type_handling must be one of 'ignore', 'warn', error'"
 
+        self.yaml_type_handling = yaml_type_handling
+
+        self.default_config = DefaultConfig(self._parse_default(config, default))
         self.logger = get_logger()
         self.verbosity = 0
 
@@ -216,8 +220,13 @@ class Config(Namespacify):
         try:
             default = _type(default_val)
         except Exception as e:
-            raise TypeError(f"Value '{default_val}' read from yaml file cannot be case to type '{_type.__name__}' "
-                            f"of base config value.")
+            msg = f"Value '{default_val}' read from yaml file cannot be case to type '{_type.__name__}' "\
+                  f"of base config value."
+            if self.yaml_type_handling == 'error':
+                raise TypeError(msg) from e
+            elif self.yaml_type_handling == 'warn':
+                self.logger.warning(msg)
+
 
         arg.update({'default': default, 'type': _type})
 
