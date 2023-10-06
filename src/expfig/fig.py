@@ -227,6 +227,8 @@ class Config(Namespacify):
             elif self.yaml_type_handling == 'warn':
                 self.logger.warning(msg)
 
+            default = default_val
+
 
         arg.update({'default': default, 'type': _type})
 
