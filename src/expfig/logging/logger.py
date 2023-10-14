@@ -31,8 +31,8 @@ def get_logger(level=logging.DEBUG, log_file=None):
     return logger
 
 class ColorFormatter(logging.Formatter):
-    def __init__(self, fmt=None, datefmt=None, style='%', validate=True):
-        super().__init__(fmt=fmt, datefmt=datefmt, style=style, validate=validate)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.formats = Formats.level_formats(self._style._fmt)
 
     def format(self, record: logging.LogRecord) -> str:
