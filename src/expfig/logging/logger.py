@@ -41,7 +41,6 @@ class ColorFormatter(logging.Formatter):
 
     @contextlib.contextmanager
     def push_format(self, level):
-        self._init()
         old_fmt = self._style._fmt
         self._style._fmt = self.formats[level]
 
