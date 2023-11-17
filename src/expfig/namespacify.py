@@ -24,20 +24,15 @@ class Namespacify(UserDict):
         return nested_dict_update(self, *args, nest_namespacify=True, **kwargs)
 
     def pprint(self, indent=0, log_func=None, _recur=False):
-        log_block = ''
-        for k, v in self.items():
-            if isinstance(v, Namespacify):
-                log_block += f'\n{v.pprint(indent+4, _recur=True)}'
-            else:
-                log_block+= f'\n{" " * indent}{k}: {v}'
+        with repr_as_default_yaml_representer():
+            str_out = yaml.safe_dump(self)
 
-        if not _recur:
-            if log_func is None:
-                print(log_block)
-            else:
-                log_func(log_block)
+        if log_func is not None:
+            log_func(str_out)
+        else:
+            print(str_out)
 
-        return log_block
+        return str_out
 
     def depth(self):
         return depth(self)
