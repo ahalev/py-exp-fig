@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import yaml
 
+from contextlib import contextmanager
 from collections import UserDict
 from logging import getLogger
 
@@ -231,3 +232,16 @@ def equal(a, b):
         return bool(a == b)
     except ValueError:
         return np.array_equal(a, b)
+
+
+@contextmanager
+def repr_as_default_yaml_representer():
+    def default_representer(dumper, data):
+        return dumper.represent_scalar('tag:yaml.org,2002:str', repr(data))
+
+    yaml.representer.SafeRepresenter.add_representer(None, default_representer)
+
+    try:
+        yield
+    finally:
+        yaml.representer.SafeRepresenter.yaml_representers.pop(None)
