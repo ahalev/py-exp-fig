@@ -146,7 +146,7 @@ class Config(Namespacify):
         return config_args, other_args
 
     def _create_parser(self, default=None):
-        parser = argparse.ArgumentParser(prog='GridRL')
+        parser = argparse.ArgumentParser()
         for arg_name, arg_info in self._get_arguments(d=default).items():
             parser.add_argument(f'--{arg_name}', **arg_info)
 
