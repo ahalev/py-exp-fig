@@ -84,6 +84,26 @@ class ListType:
 
         return str2none(value)
 
+    @classmethod
+    def from_list(cls, list_like, arg_name=None):
+        _types = pd.Series([type(x) for x in list_like])
+        unique_types = _types.unique()
+
+        try:
+            _type = unique_types.item()
+        except ValueError:
+            _type = str
+
+            if len(_types):
+                arg = f"'{arg_name}'" if arg_name else ""
+                warn(f"Collecting list-like argument {arg} with non-unique types {unique_types} in default value "
+                     "Collected values will be str.")
+
+        if _type == str:
+            _type = str2none
+
+        return cls(_type)
+
 
 class ListAction(argparse._StoreAction):
     def __init__(self, *args, **kwargs):
