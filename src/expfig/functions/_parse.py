@@ -1,5 +1,8 @@
 import argparse
+import pandas as pd
+
 from ast import literal_eval
+from warnings import warn
 
 
 def str2bool(v):
@@ -17,6 +20,25 @@ def str2none(v):
     if v == 'null':
         return None
     return v
+
+
+def parse_arg_type(arg_name, base_default):
+    additional_args = {}
+
+    if pd.api.types.is_list_like(base_default):
+        additional_args.update(nargs='+', action=ListAction)
+        _type = ListType.from_list(base_default, arg_name)
+
+    elif not base_default and not isinstance(base_default, (float, int, bool)):
+        _type = str
+    else:
+        _type = type(base_default)
+    if _type == bool:
+        _type = str2bool
+    elif _type == str:
+        _type = str2none
+
+    return _type, additional_args
 
 
 class ListType:
