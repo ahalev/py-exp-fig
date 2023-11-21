@@ -12,7 +12,7 @@ from warnings import warn
 
 from . import Namespacify, nested_dict_update
 from .functions import unflatten
-from .functions._parse import str2bool, str2none, ListType, ListAction
+from .functions._parse import str2bool, str2none, ListType, ListAction, parse_arg_type
 from .logging import get_logger
 
 
@@ -243,27 +243,16 @@ class Config(Namespacify):
                     raise NameError(f"Invalid character '-' in key '{new_key}'.")
 
                 base_default = self.default_config.get(tuple(new_key.split('.')), v)
-                args[new_key] = self._collect_argument(v, base_default)
+                args[new_key] = self._collect_argument(v, base_default, new_key)
 
         return args
 
-    def _collect_argument(self, default_val, base_default):
+    def _collect_argument(self, default_val, base_default, arg_name):
         arg = {}
 
-        if pd.api.types.is_list_like(base_default):
-            arg['nargs'] = '+'
-            arg['action'] = ListAction
-            _type = self._get_list_like_type(base_default)
+        _type, additional_args = parse_arg_type(arg_name, base_default)
 
-        elif not base_default and not isinstance(base_default, (float, int, bool)):
-            _type = str
-        else:
-            _type = type(base_default)
-
-        if _type == bool:
-            _type = str2bool
-        elif _type == str:
-            _type = str2none
+        arg.update(additional_args)
 
         try:
             default = _type(default_val)
@@ -280,23 +269,6 @@ class Config(Namespacify):
         arg.update({'default': default, 'type': _type})
 
         return arg
-
-    def _get_list_like_type(self, list_like):
-        _types = pd.Series([type(x) for x in list_like])
-
-        try:
-            _type = _types.unique().item()
-        except ValueError:
-            _type = str
-
-            if len(_types):
-                warn('Collecting list-like argument with non-unique types in default value or empty default value. '
-                     'Collected values will be str.')
-
-        if _type == str:
-            _type = str2none
-
-        return ListType(_type)
 
 
     def serialize_to_dir(self, log_dir, fname='config.yaml', use_existing_dir=False, with_default=False):
