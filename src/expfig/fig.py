@@ -156,11 +156,31 @@ class Config(Namespacify):
         return parser
 
     def _create_config_file_parser(self):
-        parser = argparse.ArgumentParser(prog='GridRLConfig')
+        parser = argparse.ArgumentParser()
         parser.add_argument('--config', default=[], nargs='+', type=ListType(str), action=ListAction)
         return parser
 
     def update_with_configs(self, configs, updatee=None):
+        """
+        Update `self` with one or multiple dict-like objects.
+
+        Parameters
+        ----------
+        configs : str, Path, dict or None
+            One of:
+            * Path-like pointing to a yaml-file to load a dict from
+            * dict
+            * list of the above
+            * None, in which case no update occurs
+        updatee : dict-like or None, default None
+            Object to update. If None, updates self.
+
+        Returns
+        -------
+        updatee: dict-like
+            Updated object.
+
+        """
         if configs is None:
             return self
         elif not pd.api.types.is_list_like(configs) or pd.api.types.is_dict_like(configs):
