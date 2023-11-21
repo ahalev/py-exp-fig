@@ -20,6 +20,34 @@ DEFAULT_CONFIG_PATH = os.path.join(os.getcwd(), 'default_config.yaml')
 
 
 class Config(Namespacify):
+    """
+    Serializable config object.
+
+    Parameters
+    ----------
+    config : str, Path, dict, None or list of str, dict, or Path, default None
+        Dictionaries of configuration values or str/Path pointing to YAML file(s) containing configuration values.
+        * If str or Path, the value is treated as a YAML file which is then loaded to a dictionary, and then:
+        * If dictionary, `Config` object will be updated to contain values in the dictionary. These values can be either
+          nested or '.'-delimited, the latter of which will be nested before updating `Config` object.
+        * If list of the above, `Config` object will be updated in corresponding order. In the case of duplicate keys,
+          the value from the **last** entry will be utilized.
+    default : dict or Path-like object, default `os.path.join(os.getcwd(), 'default_config.yaml')`.
+        Dict or path-like object from which to load default config.
+        The corresponding nested dictionary defines the arguments in argparse. For example:
+         >>> default = {'truck': {'wheels': 4, 'brand': 'toyota'}}
+         will result in argparse arguments `truck.wheels` of type `int` and `truck.brand` of type str, with defaults
+         of 4 and 'toyota', respectively.
+    yaml_type_handling: {'ignore', 'warn', 'error'}, default 'warn'
+        Handling method for values loaded from config files (either via `--config <filename>` or passed via `config`
+        parameter) that cannot be cast to the type of the value in the default config.
+        * 'ignore': silently allow mistyped values.
+        * 'warn': allow mistyped values and raise a warning if encountered.
+        * 'error': raise `TypeError`s on mistyped values.
+    Attributes
+    ----------
+
+    """
     def __init__(self, config=None, default=DEFAULT_CONFIG_PATH, yaml_type_handling='warn'):
         assert yaml_type_handling in ('ignore', 'warn', 'error'), \
             "yaml_type_handling must be one of 'ignore', 'warn', error'"
