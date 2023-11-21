@@ -272,6 +272,33 @@ class Config(Namespacify):
 
 
     def serialize_to_dir(self, log_dir, fname='config.yaml', use_existing_dir=False, with_default=False):
+        """
+        Save the config as a yaml file in a directory.
+
+        Parameters
+        ----------
+        log_dir : str or Path
+            directory to serialize into.
+
+        fname : str, default 'config.yaml`
+            Name of the file.
+
+        use_existing_dir : bool, default False
+            Whether to serialize to a directory that already exists. If False and `log_dir` exists,
+            config will be serialized to `{log_dir}_{k}`, where k is the smallest positive integer such that
+            `{log_dir}_{k}` does not currently exist.
+
+        with_default : bool, default False
+            Whether to serialize default config as well. If true, default config is serialized as `config_default.yaml`
+            in the same `log_dir` as the config. The symmetric difference is also serialized as
+            `config_difference.yaml`.
+
+        Returns
+        -------
+        log_dir : str
+            Path of the log dir the config was serialized to.
+
+        """
         log_dir = super().serialize_to_dir(log_dir, fname=fname, use_existing_dir=use_existing_dir)
 
         if with_default:
