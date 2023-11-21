@@ -27,6 +27,11 @@ class Namespacify(UserDict):
         with repr_as_default_yaml_representer():
             str_out = yaml.safe_dump(self)
 
+        if indent:
+            pref = '\t'*indent
+            str_out = str_out.replace('\n', '\n' + pref)
+            str_out = pref + str_out
+
         if log_func is not None:
             log_func(str_out)
         else:
