@@ -319,5 +319,3 @@ def _config_from_yaml(file_path):
                          f'{type(loaded_contents).__name__}, should be dict.')
 
     return loaded_contents
-
-
