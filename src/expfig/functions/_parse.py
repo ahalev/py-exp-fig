@@ -36,6 +36,7 @@ class ListType:
                 return self.type(value)
             except ValueError:
                 literal = literal_eval(value)
+                return self(literal)
 
         return self.type_check(literal)
 
