@@ -32,7 +32,7 @@ class Config(Namespacify):
           nested or '.'-delimited, the latter of which will be nested before updating `Config` object.
         * If list of the above, `Config` object will be updated in corresponding order. In the case of duplicate keys,
           the value from the **last** entry will be utilized.
-    default : dict or Path-like object, default `os.path.join(os.getcwd(), 'default_config.yaml')`.
+    default : str, Path, or dict, default `os.path.join(os.getcwd(), 'default_config.yaml')`.
         Dict or path-like object from which to load default config.
         The corresponding nested dictionary defines the arguments in argparse. For example:
          >>> default = {'truck': {'wheels': 4, 'brand': 'toyota'}}
