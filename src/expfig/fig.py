@@ -14,6 +14,7 @@ from . import Namespacify, nested_dict_update
 from .functions import unflatten
 from .functions._parse import str2bool, str2none, ListType, ListAction, parse_arg_type
 from .logging import get_logger
+from .utils.api import is_dict_like
 
 
 DEFAULT_CONFIG_PATH = os.path.join(os.getcwd(), 'default_config.yaml')
@@ -64,7 +65,7 @@ class Config(Namespacify):
         self.verbose(self.verbosity)
 
     def _parse_default(self, config, default):
-        if pd.api.types.is_dict_like(default):
+        if is_dict_like(default):
             return default
 
         candidates = [Path(default), (Path(sys.argv[0]).parent / default)]
