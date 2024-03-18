@@ -1,5 +1,6 @@
-import pandas as pd
 from collections import UserDict
+
+from expfig.utils import api
 
 
 def unflatten(arguments, delimiter='.'):
@@ -21,7 +22,7 @@ def flatten(nested, delimiter='.', levels=None, *, _key_stack=()):
 
     flat = {}
     for k, v in nested.items():
-        if pd.api.types.is_dict_like(v) and (
+        if api.is_dict_like(v) and (
             (levels >= 0 and len(_key_stack) < levels - 1) or
             (levels < 0 and depth(v) > -1 * levels)
         ):
@@ -34,7 +35,7 @@ def flatten(nested, delimiter='.', levels=None, *, _key_stack=()):
 
 
 def depth(d):
-    if pd.api.types.is_dict_like(d):
+    if api.is_dict_like(d):
         return 1 + (max(map(depth, d.values())) if d else 0)
     return 0
 
