@@ -331,7 +331,7 @@ class Config(Namespacify):
 
 class DefaultConfig(Namespacify):
     def __init__(self, default):
-        if not is_dict_like(default):
+        if not api.is_dict_like(default):
             default = _config_from_yaml(default)
 
         super().__init__(default)
