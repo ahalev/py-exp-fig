@@ -1,7 +1,6 @@
 import argparse
 import sys
 import os
-import pandas as pd
 import yaml
 
 from copy import deepcopy
@@ -14,7 +13,7 @@ from . import Namespacify, nested_dict_update
 from .functions import unflatten
 from .functions._parse import str2bool, str2none, ListType, ListAction, parse_arg_type
 from .logging import get_logger
-from .utils.api import is_dict_like
+from .utils import api
 
 
 DEFAULT_CONFIG_PATH = os.path.join(os.getcwd(), 'default_config.yaml')
@@ -65,7 +64,7 @@ class Config(Namespacify):
         self.verbose(self.verbosity)
 
     def _parse_default(self, config, default):
-        if is_dict_like(default):
+        if api.is_dict_like(default):
             return default
 
         candidates = [Path(default), (Path(sys.argv[0]).parent / default)]
@@ -184,7 +183,7 @@ class Config(Namespacify):
         """
         if configs is None:
             return self
-        elif not pd.api.types.is_list_like(configs) or pd.api.types.is_dict_like(configs):
+        elif not api.is_list_like(configs) or api.is_dict_like(configs):
             configs = [configs]
 
         for config in configs:
@@ -332,7 +331,7 @@ class Config(Namespacify):
 
 class DefaultConfig(Namespacify):
     def __init__(self, default):
-        if not pd.api.types.is_dict_like(default):
+        if not is_dict_like(default):
             default = _config_from_yaml(default)
 
         super().__init__(default)
