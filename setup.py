@@ -15,6 +15,9 @@ EXTRAS = {
     'pandas': ['pandas'],
 }
 
+EXTRAS['all'] = sum(EXTRAS.values(), [])
+
+
 setup(
     name='experiment-config',
     package_dir={'': 'src'},
