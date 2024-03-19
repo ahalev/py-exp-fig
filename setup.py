@@ -9,8 +9,10 @@ LICENSE = 'MIT License'
 PROJECT_URLS = {
     'Source Code': f'https://github.com/ahalev/experiment-config/tree/v{VERSION}'
 }
+
 EXTRAS = {
-    'dev': ['pytest']
+    'dev': ['numpy', 'pytest'],
+    'pandas': ['pandas'],
 }
 
 setup(
@@ -28,7 +30,6 @@ setup(
     long_description_content_type='text/markdown',
     include_package_data=True,
     install_requires=[
-        'pandas',
         'pyyaml'
     ],
     extras_require=EXTRAS
