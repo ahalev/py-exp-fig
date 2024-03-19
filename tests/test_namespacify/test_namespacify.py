@@ -2,6 +2,7 @@ import pytest
 import yaml
 
 from copy import deepcopy
+from types import ModuleType
 
 from expfig.namespacify import Namespacify
 from expfig.utils.get_pandas import pandas as pd
@@ -189,6 +190,7 @@ class TestNestNamespacify:
                 assert k in intersection1
                 assert intersection1[k] == v
 
+    @pytest.mark.skipif(not isinstance(pd, ModuleType), reason='pandas is not installed')
     def test_to_series(self):
         ns = Namespacify(NESTED_CONTENTS)
         series = ns.to_series()
