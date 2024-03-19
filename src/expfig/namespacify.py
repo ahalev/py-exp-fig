@@ -1,7 +1,6 @@
 import functools
 
 import numpy as np
-import pandas as pd
 import yaml
 
 from contextlib import contextmanager
@@ -12,9 +11,11 @@ from . import nested_dict_update
 from .functions import depth, flatten
 from .logging import make_sequential_log_dir
 
+from expfig.utils.get_pandas import pandas as pd
+
+
 yaml.SafeDumper.add_multi_representer(UserDict, yaml.SafeDumper.represent_dict)
 logger = getLogger(__name__)
-
 
 class Namespacify(UserDict):
     def __init__(self, in_dict):

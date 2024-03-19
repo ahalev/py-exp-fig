@@ -1,11 +1,12 @@
 import numpy as np
 import pytest
-import pandas as pd
 import yaml
 
 from copy import deepcopy
 
 from expfig.namespacify import Namespacify
+from expfig.utils.get_pandas import pandas as pd
+
 
 CONTENTS = {
     'car': 'vroom',
