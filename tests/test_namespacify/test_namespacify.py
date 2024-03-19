@@ -1,4 +1,3 @@
-import numpy as np
 import pytest
 import yaml
 
@@ -7,6 +6,7 @@ from copy import deepcopy
 from expfig.namespacify import Namespacify
 from expfig.utils.get_pandas import pandas as pd
 
+np = pytest.importorskip('numpy')
 
 CONTENTS = {
     'car': 'vroom',
