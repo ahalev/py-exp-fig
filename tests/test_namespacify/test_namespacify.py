@@ -245,4 +245,4 @@ class TestSymmetricDifference:
 
         sym_diff = ns1.symmetric_difference(ns2)
 
-        assert np.array_equal(sym_diff['car'] , ns1['car'])
+        assert np.array_equal(sym_diff['car'], ns1['car'])
