@@ -237,6 +237,7 @@ class TestSymmetricDifference:
     def test_simple(self):
         pass
 
+    @pytest.mark.skipif(not isinstance(pd, ModuleType), reason='pandas is not installed')
     def test_arr_like(self):
         ns1 = Namespacify(CONTENTS)
         ns2 = Namespacify(CONTENTS)
