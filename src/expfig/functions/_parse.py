@@ -1,8 +1,9 @@
 import argparse
-import pandas as pd
 
 from ast import literal_eval
 from warnings import warn
+
+from expfig.utils import api
 
 
 def str2bool(v):
@@ -25,7 +26,7 @@ def str2none(v):
 def parse_arg_type(arg_name, base_default):
     additional_args = {}
 
-    if pd.api.types.is_list_like(base_default):
+    if api.is_list_like(base_default):
         additional_args.update(nargs='+', action=ListAction)
         _type = ListType.from_list(base_default, arg_name)
 
@@ -86,17 +87,16 @@ class ListType:
 
     @classmethod
     def from_list(cls, list_like, arg_name=None):
-        _types = pd.Series([type(x) for x in list_like])
-        unique_types = _types.unique()
+        unique_types = {type(x) for x in list_like}
 
-        try:
-            _type = unique_types.item()
-        except ValueError:
+        if len(unique_types) == 1:
+            _type = unique_types.pop()
+        else:
             _type = str
 
-            if len(_types):
-                arg = f"'{arg_name}'" if arg_name else ""
-                warn(f"Collecting list-like argument {arg} with non-unique types {unique_types} in default value "
+            if len(unique_types):
+                arg = f"'{arg_name}' " if arg_name else ""
+                warn(f"Collecting list-like argument {arg}with non-unique types {unique_types} in default value "
                      "Collected values will be str.")
 
         if _type == str:
