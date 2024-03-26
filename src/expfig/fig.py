@@ -108,7 +108,7 @@ class Config(Namespacify):
     def _split_config_file_args(self):
         config_arg_loc = [x.startswith('--config') for x in sys.argv]
 
-        if len(config_arg_loc) > 1:
+        if sum(config_arg_loc) > 1:
             msg = "Multiple --config arguments encountered. Pass multiple configs with a single --config prefix, e.g. " \
                   "'python script.py --config config_1.yaml config_2.yaml'"
             raise TypeError(msg)
