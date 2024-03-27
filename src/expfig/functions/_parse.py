@@ -17,15 +17,15 @@ def parse_arg_type(arg_name, base_default):
 
     elif getattr(base_default, 'yaml_tag', None) is not None:  # is a Yaml object
         _type = YamlType(yaml_default=True)
-    elif base_default is None or base_default == '':
-        _type = str
+    elif base_default is None or base_default == '': # allow empty strings to be yaml-objects but no failure if not
+        _type = YamlType(yaml_default=False)
     else:
         _type = type(base_default)
 
     if _type == bool:
         _type = str2bool
-    elif _type == str:  # allow strings to be yaml-objects but no failure if not
-        _type = YamlType(yaml_default=False)
+    elif _type == str:
+        _type = str2none
 
     return _type, additional_args
 
