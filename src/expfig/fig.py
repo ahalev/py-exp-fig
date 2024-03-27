@@ -11,7 +11,7 @@ from warnings import warn
 
 from . import Namespacify, nested_dict_update
 from .functions import unflatten
-from .functions._parse import str2bool, str2none, ListType, ListAction, parse_arg_type
+from .functions._parse import ListType, ListAction, parse_arg_type
 from .logging import get_logger
 from .utils import api
 
