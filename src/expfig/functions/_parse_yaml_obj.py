@@ -5,7 +5,7 @@ from functools import reduce
 from expfig.functions._str_types import str2none
 
 
-CMD_LINE_YAML_REPLACEMENTS = [('{', '{ '), (':', ': ')]
+CMD_LINE_YAML_REPLACEMENTS = [('{', ' {'), (':', ': ')]
 
 
 class YamlType:
