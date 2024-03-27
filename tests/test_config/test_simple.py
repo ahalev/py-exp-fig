@@ -236,10 +236,49 @@ class TestYamlTypes:
         config = Config(default=YAML_CONTENTS)
         assert config.insurance == AYamlObject(10)
 
-    @mock_sys_argv('--car', '!AYamlObject {value: 10}')
+    @mock_sys_argv('--car', '!AYamlObject {value: 20}')
     def test_same_type_argv(self):
         config = Config(default=YAML_CONTENTS)
-        assert config.insurance == AYamlObject(10)
+        assert config.insurance == AYamlObject(20)
+
+    @mock_sys_argv('--insurance', '!AYamlObject{value:30}')
+    def test_same_type_argv_no_spaces(self):
+        config = Config(default=YAML_CONTENTS)
+        assert config.insurance == AYamlObject(30)
+
+    @mock_sys_argv('--car', '!AYamlObject{value:30}')
+    def test_default_nonempty_str_returns_str(self):
+        config = Config(default=YAML_CONTENTS)
+        assert config.car == '!AYamlObject{value:30}'
+
+    @mock_sys_argv('--car', '!AYamlObject{value:30}')
+    def test_default_empty_str_returns_yaml(self):
+        contents = YAML_CONTENTS.copy()
+        contents['car'] = ''
+
+        config = Config(default=contents)
+        assert config.car == AYamlObject(30)
+
+    @mock_sys_argv('--car', '!AYamlObject{value:30}')
+    def test_default_none_returns_yaml(self):
+        contents = YAML_CONTENTS.copy()
+        contents['car'] = None
+
+        config = Config(default=contents)
+        assert config.car == AYamlObject(30)
+
+    @mock_sys_argv('--insurance', '!AnotherYamlObject {a: 10, b: 11}')
+    def test_default_yaml_different_yaml_type(self):
+
+        config = Config(default=YAML_CONTENTS)
+        assert config.insurance == AnotherYamlObject(a=10, b=11)
+
+    @mock_sys_argv('--insurance', '!AnotherYamlObject{a:10,b:11}')
+    def test_default_yaml_different_yaml_type_no_spacing(self):
+
+        config = Config(default=YAML_CONTENTS)
+        assert config.insurance == AnotherYamlObject(a=10, b=11)
+
 
 
 class TestConfigFile:
