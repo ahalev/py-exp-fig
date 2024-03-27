@@ -4,6 +4,7 @@ from ast import literal_eval
 from warnings import warn
 
 from expfig.functions import str2bool, str2none
+from expfig.functions._parse_yaml_obj import YamlType
 from expfig.utils import api
 
 
@@ -14,6 +15,8 @@ def parse_arg_type(arg_name, base_default):
         additional_args.update(nargs='+', action=ListAction)
         _type = ListType.from_list(base_default, arg_name)
 
+    elif getattr(base_default, 'yaml_tag', None) is not None:  # is a Yaml object
+        _type = YamlType(yaml_default=True)
     elif base_default is None or base_default == '':
         _type = str
     else:
@@ -21,8 +24,8 @@ def parse_arg_type(arg_name, base_default):
 
     if _type == bool:
         _type = str2bool
-    elif _type == str:
-        _type = str2none
+    elif _type == str:  # allow strings to be yaml-objects but no failure if not
+        _type = YamlType(yaml_default=False)
 
     return _type, additional_args
 
