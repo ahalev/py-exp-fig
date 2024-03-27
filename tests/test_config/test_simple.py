@@ -9,6 +9,38 @@ from copy import deepcopy
 from unittest import mock
 from expfig import Config
 
+
+class AYamlObject(yaml.YAMLObject):
+    yaml_dumper = yaml.SafeDumper
+    yaml_loader = yaml.SafeLoader
+    yaml_tag = u'!AYamlObject'
+
+    def __init__(self, value):
+        self.value = value
+
+    def __eq__(self, other):
+        if type(self) != type(other):
+            return NotImplemented
+
+        return self.value == other.value
+
+
+class AnotherYamlObject(yaml.YAMLObject):
+    yaml_dumper = yaml.SafeDumper
+    yaml_loader = yaml.SafeLoader
+    yaml_tag = u'!AnotherYamlObject'
+
+    def __init__(self, a=None, b=None):
+        self.a = a
+        self.b = b
+
+    def __eq__(self, other):
+        if type(self) != type(other):
+            return NotImplemented
+
+        return self.a == other.a and self.b == other.b
+
+
 CONTENTS = {
     'car': 'vroom',
     'wheels': 4,
@@ -31,6 +63,11 @@ NESTED_CONTENTS = {
     },
     'dealer': 'michael-jordan-nissan'
 }
+
+YAML_CONTENTS = {
+        **CONTENTS,
+        'insurance': AYamlObject(value=10)
+    }
 
 
 def mock_sys_argv(*args):
@@ -192,6 +229,17 @@ class TestListRead:
 
         assert config.truck.axles == 8
         assert isinstance(config.truck.axles, float)
+
+
+class TestYamlTypes:
+    def test_no_argv(self):
+        config = Config(default=YAML_CONTENTS)
+        assert config.insurance == AYamlObject(10)
+
+    @mock_sys_argv('--car', '!AYamlObject {value: 10}')
+    def test_same_type_argv(self):
+        config = Config(default=YAML_CONTENTS)
+        assert config.insurance == AYamlObject(10)
 
 
 class TestConfigFile:
