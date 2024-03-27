@@ -15,15 +15,24 @@ class YamlType:
         self.yaml_default = yaml_default
 
     def __call__(self, value):
-        if self.yaml_default:
-            return _load_yaml_value(value)
-        elif is_yaml_str(value):  # try to load yaml but if not no worries, just return value
+        if self.yaml_default and is_yaml_obj(value):
+            return value
+
+        if is_yaml_str(value):
             try:
                 return _load_yaml_value(value)
             except yaml.YAMLError:
-                pass
+                if self.yaml_default:
+                    raise
+
+        elif self.yaml_default:
+            raise yaml.constructor.ConstructorError(f"value '{value}' does not begin with a yaml tag (!).")
 
         return str2none(value)
+
+
+def is_yaml_obj(value):
+    return getattr(value, 'yaml_tag', None) is not None
 
 
 def is_yaml_str(value):
