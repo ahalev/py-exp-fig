@@ -30,10 +30,11 @@ def parse_arg_type(arg_name, base_default):
         additional_args.update(nargs='+', action=ListAction)
         _type = ListType.from_list(base_default, arg_name)
 
-    elif not base_default and not isinstance(base_default, (float, int, bool)):
+    elif base_default is None or base_default == '':
         _type = str
     else:
         _type = type(base_default)
+
     if _type == bool:
         _type = str2bool
     elif _type == str:
