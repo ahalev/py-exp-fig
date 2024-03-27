@@ -18,7 +18,7 @@ def str2bool(v):
 
 
 def str2none(v):
-    if v == 'null':
+    if v in ['None', 'null']:
         return None
     return v
 
