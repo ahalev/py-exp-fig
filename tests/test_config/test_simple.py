@@ -9,6 +9,38 @@ from copy import deepcopy
 from unittest import mock
 from expfig import Config
 
+
+class InsuranceA(yaml.YAMLObject):
+    yaml_dumper = yaml.SafeDumper
+    yaml_loader = yaml.SafeLoader
+    yaml_tag = u'!InsuranceA'
+
+    def __init__(self, value):
+        self.value = value
+
+    def __eq__(self, other):
+        if type(self) != type(other):
+            return NotImplemented
+
+        return self.value == other.value
+
+
+class InsuranceB(yaml.YAMLObject):
+    yaml_dumper = yaml.SafeDumper
+    yaml_loader = yaml.SafeLoader
+    yaml_tag = u'!InsuranceB'
+
+    def __init__(self, a=None, b=None):
+        self.a = a
+        self.b = b
+
+    def __eq__(self, other):
+        if type(self) != type(other):
+            return NotImplemented
+
+        return self.a == other.a and self.b == other.b
+
+
 CONTENTS = {
     'car': 'vroom',
     'wheels': 4,
@@ -31,6 +63,11 @@ NESTED_CONTENTS = {
     },
     'dealer': 'michael-jordan-nissan'
 }
+
+YAML_CONTENTS = {
+        **CONTENTS,
+        'insurance': InsuranceA(value=10)
+    }
 
 
 def mock_sys_argv(*args):
@@ -192,6 +229,55 @@ class TestListRead:
 
         assert config.truck.axles == 8
         assert isinstance(config.truck.axles, float)
+
+
+class TestYamlTypes:
+    def test_no_argv(self):
+        config = Config(default=YAML_CONTENTS)
+        assert config.insurance == InsuranceA(10)
+
+    @mock_sys_argv('--insurance', '!InsuranceA {value: 20}')
+    def test_same_type_argv(self):
+        config = Config(default=YAML_CONTENTS)
+        assert config.insurance == InsuranceA(20)
+
+    @mock_sys_argv('--insurance', '!InsuranceA{value:30}')
+    def test_same_type_argv_no_spaces(self):
+        config = Config(default=YAML_CONTENTS)
+        assert config.insurance == InsuranceA(30)
+
+    @mock_sys_argv('--car', '!InsuranceA{value:30}')
+    def test_default_nonempty_str_returns_str(self):
+        config = Config(default=YAML_CONTENTS)
+        assert config.car == '!InsuranceA{value:30}'
+
+    @mock_sys_argv('--car', '!InsuranceA{value:30}')
+    def test_default_empty_str_returns_yaml(self):
+        contents = YAML_CONTENTS.copy()
+        contents['car'] = ''
+
+        config = Config(default=contents)
+        assert config.car == InsuranceA(30)
+
+    @mock_sys_argv('--car', '!InsuranceA{value:30}')
+    def test_default_none_returns_yaml(self):
+        contents = YAML_CONTENTS.copy()
+        contents['car'] = None
+
+        config = Config(default=contents)
+        assert config.car == InsuranceA(30)
+
+    @mock_sys_argv('--insurance', '!InsuranceB {a: 10, b: 11}')
+    def test_default_yaml_different_yaml_type(self):
+
+        config = Config(default=YAML_CONTENTS)
+        assert config.insurance == InsuranceB(a=10, b=11)
+
+    @mock_sys_argv('--insurance', '!InsuranceB{a:10,b:11}')
+    def test_default_yaml_different_yaml_type_no_spacing(self):
+
+        config = Config(default=YAML_CONTENTS)
+        assert config.insurance == InsuranceB(a=10, b=11)
 
 
 class TestConfigFile:

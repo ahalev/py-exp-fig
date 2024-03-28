@@ -3,24 +3,9 @@ import argparse
 from ast import literal_eval
 from warnings import warn
 
+from expfig.functions import str2bool, str2none
+from expfig.functions._parse_yaml_obj import YamlType
 from expfig.utils import api
-
-
-def str2bool(v):
-    if isinstance(v, bool):
-        return v
-    if v.lower() in ('yes', 'true', 't', 'y', '1'):
-        return True
-    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
-        return False
-    else:
-        raise argparse.ArgumentTypeError('Boolean value expected.')
-
-
-def str2none(v):
-    if v == 'null':
-        return None
-    return v
 
 
 def parse_arg_type(arg_name, base_default):
@@ -30,10 +15,13 @@ def parse_arg_type(arg_name, base_default):
         additional_args.update(nargs='+', action=ListAction)
         _type = ListType.from_list(base_default, arg_name)
 
-    elif not base_default and not isinstance(base_default, (float, int, bool)):
-        _type = str
+    elif getattr(base_default, 'yaml_tag', None) is not None:  # is a Yaml object
+        _type = YamlType(yaml_default=True)
+    elif base_default is None or base_default == '': # allow empty strings to be yaml-objects but no failure if not
+        _type = YamlType(yaml_default=False)
     else:
         _type = type(base_default)
+
     if _type == bool:
         _type = str2bool
     elif _type == str:
