@@ -94,7 +94,7 @@ class Config(Namespacify):
 
         if len(parsed_args[1]):
             valid_option_keys = sorted(parsed_args[0].__dict__.keys())
-            warn_msg = similar_args = get_similar_args_str_fmt(parsed_args[1], valid_option_keys)
+            warn_msg = get_similar_args_str_fmt(parsed_args[1], valid_option_keys)
             warn(warn_msg)
 
         # TODO (ahalev) deprecate, this should be handled by str2None
