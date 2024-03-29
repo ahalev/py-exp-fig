@@ -10,7 +10,7 @@ from pathlib import Path
 from warnings import warn
 
 from . import Namespacify, nested_dict_update
-from .functions import unflatten
+from .functions import unflatten, get_similar_args_str_fmt
 from .functions._parse import ListType, ListAction, parse_arg_type
 from .logging import get_logger
 from .utils import api
@@ -93,8 +93,9 @@ class Config(Namespacify):
         parsed_args = self._create_parser(default=base_config).parse_known_args(args=other_args)
 
         if len(parsed_args[1]):
-            valid_args = "\n\t\t".join(sorted(parsed_args[0].__dict__.keys()))
-            warn(f'Unrecognized arguments {parsed_args[1]}.\n\tValid arguments:\n\t\t{valid_args}')
+            valid_option_keys = sorted(parsed_args[0].__dict__.keys())
+            warn_msg = similar_args = get_similar_args_str_fmt(parsed_args[1], valid_option_keys)
+            warn(warn_msg)
 
         # TODO (ahalev) deprecate, this should be handled by str2None
         args_dict = {k: v if v != 'null' else None for k, v in parsed_args[0].__dict__.items()}
