@@ -11,6 +11,7 @@ from . import nested_dict_update
 from .functions import depth, flatten
 from .logging import make_sequential_log_dir
 
+from expfig.utils.api import is_dict_like
 from expfig.utils.get_pandas import pandas as pd
 
 
@@ -132,7 +133,9 @@ class Namespacify(UserDict):
         """
         diff = {}
         for k, v in self.items():
-            if k not in other:
+            if not is_dict_like(other):
+                diff[k] = v
+            elif k not in other:
                 diff[k] = v
             elif not equal(v, other[k]):
                 if isinstance(v, Namespacify):
