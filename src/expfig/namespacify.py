@@ -50,7 +50,13 @@ class Namespacify(UserDict):
 
     def to_series(self):
         series = pd.json_normalize(self.to_dict()).squeeze()
-        series.index = pd.MultiIndex.from_tuples([x.split('.') for x in series.index])
+
+        try:
+            series.index = pd.MultiIndex.from_tuples([x.split('.') for x in series.index])
+        except TypeError:
+            if not series.empty:
+                raise
+
         return series
 
     def flatten(self, delimiter='.', levels=None):

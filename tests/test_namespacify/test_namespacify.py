@@ -199,6 +199,11 @@ class TestNestNamespacify:
         assert series.loc['truck'].equals(pd.Series(NESTED_CONTENTS['truck']))
         assert series.loc[pd.IndexSlice[:, 'car']].equals(pd.Series(['vroom', 'skirt'], index=['jeep', 'truck']))
 
+    @pytest.mark.skipif(not isinstance(pd, ModuleType), reason='pandas is not installed')
+    def test_to_series_empty(self):
+        ns = Namespacify(dict())
+        assert ns.to_series().empty
+
     def test_setitem_tuple(self):
         ns = Namespacify(NESTED_CONTENTS)
         ns[('truck', 'axles')] = 32
