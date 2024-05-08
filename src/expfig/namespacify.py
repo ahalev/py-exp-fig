@@ -191,7 +191,10 @@ class Namespacify(UserDict):
             out = self[item[0]]
             if len(item) == 1:
                 return out
-            return out[item[1:]]
+            try:
+                return out[item[1:]]
+            except TypeError:  # out is not subscriptable, raise KeyError
+                raise KeyError(f"'{item[1:]}', item of type '{type(out).__name__}' is not subscriptable")
 
         return super().__getitem__(item)
 
