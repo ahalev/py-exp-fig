@@ -101,6 +101,9 @@ class Namespacify(UserDict):
 
         diff = {}
 
+        if type(self) != type(other):
+            return self.copy()
+
         keys = {*self.keys(), *other.keys()}
         for k in keys:
             if k not in self:
