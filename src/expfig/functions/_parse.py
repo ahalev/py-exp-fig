@@ -75,7 +75,7 @@ class ListType:
 
     @classmethod
     def from_list(cls, list_like, arg_name=None):
-        unique_types = {type(x) for x in list_like}
+        unique_types = {type(x) for x in list_like if x is not None}
 
         if len(unique_types) == 1:
             _type = unique_types.pop()
