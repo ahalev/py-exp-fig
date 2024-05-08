@@ -55,7 +55,7 @@ def nested_dict_update(nested_dict, *args, nest_namespacify=False, **kwargs):
 
     for k, v in d.items():
         if isinstance(v, (dict, UserDict)):
-            if k in nested_dict:
+            if k in nested_dict and api.is_dict_like(nested_dict[k]):
                 nested_dict_update(
                     nested_dict[k], v, nest_namespacify=(nest_namespacify or isinstance(nested_dict[k], Namespacify))
                 )
