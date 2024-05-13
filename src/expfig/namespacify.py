@@ -172,6 +172,11 @@ class Namespacify(UserDict):
     def deserialize(cls, stream):
         return cls(yaml.safe_load(stream))
 
+    @classmethod
+    def from_yaml(cls, filepath):
+        with open(filepath, 'r') as stream:
+            return cls.deserialize(stream)
+
     def __dir__(self):
         rv = set(super().__dir__())
 
