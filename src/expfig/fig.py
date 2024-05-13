@@ -10,8 +10,8 @@ from pathlib import Path
 from warnings import warn
 
 from . import Namespacify, nested_dict_update
-from .functions import unflatten, get_similar_args_str_fmt
-from .functions._parse import ListType, ListAction, parse_arg_type
+from .core import unflatten, get_similar_args_str_fmt
+from .core._parse import ListType, ListAction, parse_arg_type
 from .logging import get_logger
 from .utils import api
 

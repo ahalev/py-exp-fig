@@ -1,7 +1,7 @@
 import pytest
 
-from expfig.functions._parse import ListType
-from expfig.functions import str2none
+from expfig.core._parse import ListType
+from expfig.core import str2none
 
 
 class TestListTypeFromList:

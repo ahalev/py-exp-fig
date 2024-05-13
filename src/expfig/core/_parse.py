@@ -3,8 +3,8 @@ import argparse
 from ast import literal_eval
 from warnings import warn
 
-from expfig.functions import str2bool, str2none
-from expfig.functions._parse_yaml_obj import YamlType
+from expfig.core import str2bool, str2none
+from expfig.core._parse_yaml_obj import YamlType
 from expfig.utils import api
 
 
