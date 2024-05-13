@@ -8,7 +8,7 @@ from collections import UserDict
 from logging import getLogger
 
 from . import nested_dict_update
-from .functions import depth, flatten
+from .core import depth, flatten
 from .logging import make_sequential_log_dir
 
 from expfig.utils.api import is_dict_like

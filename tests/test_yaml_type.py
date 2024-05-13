@@ -1,7 +1,7 @@
 import pytest
 import yaml
 
-from expfig.functions._parse_yaml_obj import YamlType
+from expfig.core._parse_yaml_obj import YamlType
 
 
 class AYamlObject(yaml.YAMLObject):
