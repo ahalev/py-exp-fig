@@ -17,10 +17,8 @@ def compare(ns, base=None):
     -------
 
     """
-    if base is None:
-        base = Namespacify(dict())
-
-    base = _load_if_necessary(base)
+    if base is not None:
+        base = _load_if_necessary(base)
 
     if not is_dict_like(ns):
         ns = dict(enumerate(ns))
@@ -29,7 +27,10 @@ def compare(ns, base=None):
 
     pairwise_diffs = {}
     for name, namespace in ns.items():
-        diffs = [namespace.difference(base).to_series()]
+        diffs = []
+        if base is not None:
+            diffs.append(namespace.difference(base).to_series())
+
         diffs.extend(namespace.difference(other_namespace).to_series() for other_namespace in ns.values())
         pairwise_diffs[name] = pd.concat(diffs).drop_duplicates()
 
