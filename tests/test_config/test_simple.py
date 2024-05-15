@@ -94,6 +94,11 @@ class TestSimpleConfig:
         config = Config(default=CONTENTS)
         assert config.car == 'skirt'
 
+    @mock_sys_argv('--car', 'null')
+    def test_null_argv(self):
+        config = Config(default=CONTENTS)
+        assert config.car is None
+
     @mock_sys_argv('--dealer', 'michael-jordan-toyota', '--truck.car', 'bing')
     def test_nested_argv(self):
         config = Config(default=NESTED_CONTENTS)
