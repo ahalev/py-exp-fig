@@ -97,7 +97,7 @@ class Config(Namespacify):
             warn_msg = get_similar_args_str_fmt(parsed_args[1], valid_option_keys)
             warn(warn_msg)
 
-        args_dict = self._extract_verbosity(args_dict)
+        args_dict = self._extract_verbosity(parsed_args[0].__dict__)
         restructured = unflatten(args_dict)
 
         self._check_restructured(restructured, self.default_config)
