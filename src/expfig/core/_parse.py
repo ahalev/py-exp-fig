@@ -3,7 +3,7 @@ import argparse
 from ast import literal_eval
 from warnings import warn
 
-from expfig.core import str2bool, str2none
+from expfig.core import str2bool, str2none, TypeToNone
 from expfig.core._parse_yaml_obj import YamlType
 from expfig.utils import api
 
@@ -35,16 +35,16 @@ class ListType:
     # TODO (ahalev) make this a metaclass, inherit from type and deprecate this class attr
 
     def __init__(self, _type):
-        self.type = _type
+        self._type = TypeToNone(_type)
 
     def __call__(self, value):
         if isinstance(value, list):
-            literal = [self.type(v) for v in value]
-        elif self.type in (str, str2none):
+            literal = [self._type.type(v) for v in value]
+        elif self._type.type == str:
             literal = self.str2none_eval(value)
         else:
             try:
-                return self.type(value)
+                return self._type(value)
             except ValueError:
                 literal = literal_eval(value)
                 return self(literal)
@@ -52,18 +52,19 @@ class ListType:
         return self.type_check(literal)
 
     def type_check(self, value):
-        if isinstance(value, list) and all(isinstance(v, self.types_to_check) for v in value) or \
-                isinstance(value, self.types_to_check):
+        if isinstance(value, list) and all(isinstance(v, self.valid_types) for v in value) or \
+                isinstance(value, self.valid_types):
             return value
 
-        raise argparse.ArgumentTypeError(f'Invalid value(s) for type {self.type}: {value}')
+        raise argparse.ArgumentTypeError(f'Invalid value(s) for type {self._type}: {value}')
 
     @property
-    def types_to_check(self):
-        if self.type == str2none:
-            return str, type(None)
+    def valid_types(self):
+        return self._type.valid_types
 
-        return self.type
+    @property
+    def type(self):
+        return self._type.type
 
     @staticmethod
     def str2none_eval(value):
@@ -87,9 +88,6 @@ class ListType:
                 warn(f"Collecting list-like argument {arg}with non-unique types {unique_types} in default value "
                      "Collected values will be str.")
 
-        if _type == str:
-            _type = str2none
-
         return cls(_type)
 
 
@@ -102,3 +100,10 @@ class ListAction(argparse._StoreAction):
             values = values[0]
 
         return super().__call__(parser, namespace, values, option_string=None)
+
+
+def get_type(type_obj):
+    try:
+        return type_obj.type.__name__
+    except AttributeError:
+        return type_obj.__name__

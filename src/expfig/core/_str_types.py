@@ -12,7 +12,40 @@ def str2bool(v):
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
-def str2none(v):
-    if v in ['None', 'null']:
-        return None
-    return v
+# def str2none(v):
+#     if v in ['None', 'null']:
+#         return None
+#     return v
+
+
+def type2none(_type):
+    def to_none(v):
+        if v in ('None', 'null'):
+            return None
+        return _type(v)
+
+    to_none.type = _type
+
+    return to_none
+
+
+class TypeToNone:
+    def __init__(self, _type):
+        self.type = _type
+
+    def __call__(self, v):
+        if v in ('None', 'null'):
+            return None
+        return self.type(v)
+
+    def __repr__(self):
+        return f'TypeToNone({repr(self.type)})'
+
+    @property
+    def valid_types(self):
+        return self.type, type(None)
+
+
+str2none = TypeToNone(str)
+float2none = type2none(float)
+int2none = type2none(int)

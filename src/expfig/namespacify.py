@@ -214,7 +214,6 @@ class Namespacify(UserDict):
         else:
             super().__setitem__(key, value)
 
-
     def __getattr__(self, item):
         if item == 'data':
             raise RuntimeError('Attempting to access self.data before initialization.')
