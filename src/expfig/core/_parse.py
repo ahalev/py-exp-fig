@@ -39,7 +39,7 @@ class ListType:
 
     def __call__(self, value):
         if isinstance(value, list):
-            literal = [self._type.type(v) for v in value]
+            literal = [self._type(v) for v in value]
         elif self._type.type == str:
             literal = self.str2none_eval(value)
         else:
