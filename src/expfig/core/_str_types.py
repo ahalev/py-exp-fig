@@ -30,5 +30,3 @@ class TypeToNone:
 
 
 str2none = TypeToNone(str)
-float2none = type2none(float)
-int2none = type2none(int)
