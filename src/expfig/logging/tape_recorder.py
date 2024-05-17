@@ -1,3 +1,4 @@
+import re
 import sys
 from io import StringIO, TextIOBase, TextIOWrapper
 from contextlib import ContextDecorator
@@ -103,7 +104,7 @@ class _IOList(TextIOBase):
         self._original_flush = self._original_stream.flush
 
     def write(self, line):
-        o = [self._original_write(line)] + [s.write(line) for s in self._io_streams]
+        o = [self._original_write(line)] + [s.write(escape_ansi(line)) for s in self._io_streams]
         return max(o)
 
     def flush(self):
@@ -131,3 +132,8 @@ class _IOList(TextIOBase):
         self._original_stream.write = self._original_write
         self._original_stream.flush = self._original_flush
         self.close()
+
+
+def escape_ansi(line):
+    ansi_escape = re.compile(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')
+    return ansi_escape.sub('', line)
