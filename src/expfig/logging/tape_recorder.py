@@ -28,7 +28,7 @@ class TapeRecorder(ContextDecorator):
 
     def add_file(self, file_like, copy_history=True):
         if not isinstance(file_like, TextIOBase):
-            file_like = open(file_like, 'w+')
+            file_like = open(file_like, 'w')
 
         if self._initialized:
             if copy_history:
@@ -57,11 +57,8 @@ class TapeRecorder(ContextDecorator):
         if self._dest is None:
             return self._string.getvalue()
 
-        if self._dest.closed:
-            with open(self._dest.name, 'r') as f:
-                return f.read()
-
-        return self._dest.read()
+        with open(self._dest.name, 'r') as f:
+            return f.read()
 
     @property
     def destination(self):
