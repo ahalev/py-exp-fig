@@ -21,6 +21,7 @@ class TapeRecorder(ContextDecorator):
             self._init(dest)
 
     def _init(self, dest=None):
+        self._dest = None
         self._string = StringIO()
 
         if dest is not None:
@@ -31,16 +32,14 @@ class TapeRecorder(ContextDecorator):
         self._status = TapeStatus.INITIALIZED
 
     def reset(self, dest=None):
-        self._stdout.remove(self.destination)
-        self._stderr.remove(self.destination)
-
-        self._string = StringIO()
-
         if dest is not None:
             self.add_file(dest, copy_history=False)
+        else:
+            new_string = StringIO()
+            self._replace_destination(new_string)
 
-        self._stdout.add(self.destination)
-        self._stderr.add(self.destination)
+            self._dest = None
+            self._string = new_string
 
         self._status = TapeStatus.INITIALIZED
 
@@ -50,7 +49,7 @@ class TapeRecorder(ContextDecorator):
 
         if self._status >= TapeStatus.INITIALIZED:
             if copy_history:
-                file_like.write(self._string.getvalue())
+                file_like.write(self.read_tape())
                 file_like.flush()
 
             if not self._string.closed:
@@ -59,19 +58,15 @@ class TapeRecorder(ContextDecorator):
         self.set_dest(file_like)
 
     def set_dest(self, dest):
-        if self._stdout is not None:
-            self._stdout.add(dest)
+        self._replace_destination(dest)
+        self._dest = dest
 
-            if self.destination in self._stdout:
-                self._stdout.remove(self.destination)
+    def _replace_destination(self, new_destination):
+        if self._stdout is not None:
+            self._stdout.replace(self.destination, new_destination)
 
         if self._stderr is not None:
-            self._stderr.add(dest)
-
-            if self.destination in self._stderr:
-                self._stderr.remove(self.destination)
-
-        self._dest = dest
+            self._stderr.replace(self.destination, new_destination)
 
     def read_tape(self):
         if self._dest is None:
@@ -153,6 +148,10 @@ class _IOList(TextIOBase):
 
     def remove(self, stream):
         self._io_streams.remove(stream)
+
+    def replace(self, old, new):
+        self._io_streams.remove(old)
+        self._io_streams.add(new)
 
     def __contains__(self, item):
         return self._io_streams.__contains__(item)
