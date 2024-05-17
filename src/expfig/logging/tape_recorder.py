@@ -67,11 +67,11 @@ class TapeRecorder(ContextDecorator):
 
     @property
     def stdout_streams(self):
-        return sys.__stdout__, self.destination
+        return sys.stdout, self.destination
 
     @property
     def stderr_streams(self):
-        return sys.__stderr__, self.destination
+        return sys.stderr, self.destination
 
     @property
     def destination(self):
