@@ -2,16 +2,18 @@ import re
 import sys
 from io import StringIO, TextIOBase, TextIOWrapper
 from contextlib import ContextDecorator
+from typing import Union
 
 
 class TapeRecorder(ContextDecorator):
-    _dest: 'TextIOWrapper' = None
+    _dest: 'Union[TextIOWrapper, None]'
     _string: 'StringIO' = None
     _stdout: '_IOList' = None
     _stderr: '_IOList' = None
 
     def __init__(self, dest=None):
         super().__init__()
+        self._dest = None
         self._initialized = False
 
         if dest is not None:
@@ -25,6 +27,20 @@ class TapeRecorder(ContextDecorator):
 
         self._stdout = _IOList(sys.stdout, self.destination)
         self._stderr = _IOList(sys.stderr, self.destination)
+        self._initialized = True
+
+    def reset(self, dest=None):
+        self._stdout.remove(self.destination)
+        self._stderr.remove(self.destination)
+
+        self._string = StringIO()
+
+        if dest is not None:
+            self.add_file(dest, copy_history=False)
+
+        self._stdout.add(self.destination)
+        self._stderr.add(self.destination)
+
         self._initialized = True
 
     def add_file(self, file_like, copy_history=True):
@@ -44,20 +60,24 @@ class TapeRecorder(ContextDecorator):
     def set_dest(self, dest):
         if self._stdout is not None:
             self._stdout.add(dest)
-            self._stdout.remove(self.destination)
+
+            if self.destination in self._stdout:
+                self._stdout.remove(self.destination)
 
         if self._stderr is not None:
             self._stderr.add(dest)
-            self._stderr.remove(self.destination)
+
+            if self.destination in self._stderr:
+                self._stderr.remove(self.destination)
 
         self._dest = dest
 
     def read_tape(self):
-        if not self._initialized:
-            raise RuntimeError('Attempting to read never-initialized tape.')
-
         if self._dest is None:
-            return self._string.getvalue()
+            try:
+                return self._string.getvalue()
+            except ValueError:
+                raise ValueError('Attempting to read from never-entered tape.')
 
         with open(self._dest.name, 'r') as f:
             return f.read()
@@ -94,6 +114,8 @@ class TapeRecorder(ContextDecorator):
         for cm in (self._stdout, self._stderr):
             cm.__exit__(exc_type, exc_val, exc_tb)
 
+        self._initialized = False
+
 
 class _IOList(TextIOBase):
     def __init__(self, original_stream, *io_streams):
@@ -122,6 +144,9 @@ class _IOList(TextIOBase):
 
     def remove(self, stream):
         self._io_streams.remove(stream)
+
+    def __contains__(self, item):
+        return self._io_streams.__contains__(item)
 
     def __enter__(self):
         self._original_stream.write = self.write
