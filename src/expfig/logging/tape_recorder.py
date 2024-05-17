@@ -33,6 +33,7 @@ class TapeRecorder(ContextDecorator):
         if self._initialized:
             if copy_history:
                 file_like.write(self._string.getvalue())
+                file_like.flush()
 
             if not self._string.closed:
                 self._string.close()
