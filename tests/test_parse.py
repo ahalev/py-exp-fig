@@ -9,7 +9,7 @@ class TestListTypeFromList:
         list_like = 'a', 'b', 'c'
         list_type = ListType.from_list(list_like)
 
-        assert list_type.type == str2none
+        assert list_type.type == str
 
     def test_all_int(self):
         list_like = 0, 4, 10
@@ -29,4 +29,4 @@ class TestListTypeFromList:
         with pytest.warns(UserWarning, match='Collecting list-like argument'):
             list_type = ListType.from_list(list_like)
 
-        assert list_type.type == str2none
+        assert list_type.type == str

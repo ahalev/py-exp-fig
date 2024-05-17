@@ -11,7 +11,7 @@ from warnings import warn
 
 from . import Namespacify, nested_dict_update
 from .core import unflatten, get_similar_args_str_fmt
-from .core._parse import ListType, ListAction, parse_arg_type
+from .core._parse import ListType, ListAction, parse_arg_type, get_type
 from .logging import get_logger
 from .utils import api
 
@@ -261,7 +261,7 @@ class Config(Namespacify):
         try:
             default = _type(default_val)
         except Exception as e:
-            msg = f"Value '{default_val}' read from yaml file cannot be case to type '{_type.__name__}' "\
+            msg = f"Value '{default_val}' read from yaml file cannot be case to type '{get_type(_type)}' "\
                   f"of base config value."
             if self.yaml_type_handling == 'error':
                 raise TypeError(msg) from e
