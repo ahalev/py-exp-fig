@@ -2,6 +2,7 @@ import re
 import sys
 from io import StringIO, TextIOBase, TextIOWrapper
 from contextlib import ContextDecorator
+from enum import IntEnum
 from typing import Union
 
 
@@ -14,7 +15,7 @@ class TapeRecorder(ContextDecorator):
     def __init__(self, dest=None):
         super().__init__()
         self._dest = None
-        self._initialized = False
+        self._status = TapeStatus.UNOPENED
 
         if dest is not None:
             self._init(dest)
@@ -27,7 +28,7 @@ class TapeRecorder(ContextDecorator):
 
         self._stdout = _IOList(sys.stdout, self.destination)
         self._stderr = _IOList(sys.stderr, self.destination)
-        self._initialized = True
+        self._status = TapeStatus.INITIALIZED
 
     def reset(self, dest=None):
         self._stdout.remove(self.destination)
@@ -41,13 +42,13 @@ class TapeRecorder(ContextDecorator):
         self._stdout.add(self.destination)
         self._stderr.add(self.destination)
 
-        self._initialized = True
+        self._status = TapeStatus.INITIALIZED
 
     def add_file(self, file_like, copy_history=True):
         if not isinstance(file_like, TextIOBase):
             file_like = open(file_like, 'w')
 
-        if self._initialized:
+        if self._status >= TapeStatus.INITIALIZED:
             if copy_history:
                 file_like.write(self._string.getvalue())
                 file_like.flush()
@@ -90,8 +91,12 @@ class TapeRecorder(ContextDecorator):
     def destination(self, value):
         self.set_dest(value)
 
-    def record(self):
-        self.__enter__()
+    @property
+    def status(self):
+        return self._status
+
+    def record(self, dest=None, copy_history=True):
+        self.__enter__(dest, copy_history)
 
     def end_record(self):
         self.__exit__(None, None, None)
@@ -100,13 +105,17 @@ class TapeRecorder(ContextDecorator):
         self.__exit__(None, None, None)
 
     def __enter__(self, dest=None, copy_history=True):
-        if not self._initialized:
+        if self._status == TapeStatus.UNOPENED:
             self._init(dest)
+        elif self._status == TapeStatus.CLOSED:
+            self.reset(dest)
         elif dest is not None:
             self.add_file(dest, copy_history=copy_history)
 
         for cm in (self._stdout, self._stderr):
             cm.__enter__()
+
+        self._status = TapeStatus.ACTIVE
 
         return self
 
@@ -114,7 +123,7 @@ class TapeRecorder(ContextDecorator):
         for cm in (self._stdout, self._stderr):
             cm.__exit__(exc_type, exc_val, exc_tb)
 
-        self._initialized = False
+        self._status = TapeStatus.CLOSED
 
 
 class _IOList(TextIOBase):
@@ -157,6 +166,13 @@ class _IOList(TextIOBase):
         self._original_stream.write = self._original_write
         self._original_stream.flush = self._original_flush
         self.close()
+
+
+class TapeStatus(IntEnum):
+    UNOPENED = -2
+    INITIALIZED = -1
+    ACTIVE = 0
+    CLOSED = 1
 
 
 def escape_ansi(line):
