@@ -1,7 +1,6 @@
 import sys
 from io import StringIO, TextIOBase, TextIOWrapper
-from contextlib import redirect_stdout, redirect_stderr, ContextDecorator
-from typing import Tuple, Union
+from contextlib import ContextDecorator
 
 
 class TapeRecorder(ContextDecorator):
@@ -9,7 +8,6 @@ class TapeRecorder(ContextDecorator):
     _string: 'StringIO' = None
     _stdout: '_IOList' = None
     _stderr: '_IOList' = None
-    _cms: 'Union[Tuple, None]' = None
 
     def __init__(self, dest=None):
         super().__init__()
@@ -24,8 +22,8 @@ class TapeRecorder(ContextDecorator):
         if dest is not None:
             self.add_file(dest)
 
-        self._stdout = _IOList(self.stdout_streams)
-        self._stderr = _IOList(self.stderr_streams)
+        self._stdout = _IOList(sys.stdout, self.destination)
+        self._stderr = _IOList(sys.stderr, self.destination)
         self._initialized = True
 
     def add_file(self, file_like, copy_history=True):
@@ -66,14 +64,6 @@ class TapeRecorder(ContextDecorator):
         return self._dest.read()
 
     @property
-    def stdout_streams(self):
-        return sys.stdout, self.destination
-
-    @property
-    def stderr_streams(self):
-        return sys.stderr, self.destination
-
-    @property
     def destination(self):
         return self._dest or self._string
 
@@ -88,8 +78,7 @@ class TapeRecorder(ContextDecorator):
         self.__exit__(None, None, None)
 
     def __del__(self):
-        if self._cms is not None:
-            self.__exit__(None, None, None)
+        self.__exit__(None, None, None)
 
     def __enter__(self, dest=None, copy_history=True):
         if not self._initialized:
@@ -97,32 +86,31 @@ class TapeRecorder(ContextDecorator):
         elif dest is not None:
             self.add_file(dest, copy_history=copy_history)
 
-        self._cms = (
-            redirect_stdout(self._stdout),
-            redirect_stderr(self._stderr)
-        )
-        for cm in self._cms:
+        for cm in (self._stdout, self._stderr):
             cm.__enter__()
 
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        for cm in self._cms:
+        for cm in (self._stdout, self._stderr):
             cm.__exit__(exc_type, exc_val, exc_tb)
-
-        self._cms = None
-        self.destination.close()
 
 
 class _IOList(TextIOBase):
-    def __init__(self, io_streams):
+    def __init__(self, original_stream, *io_streams):
+        self._original_stream = original_stream
         self._io_streams = set(io_streams)
 
+        self._original_write = self._original_stream.write
+        self._original_flush = self._original_stream.flush
+
     def write(self, line):
-        o = [s.write(line) for s in self._io_streams]
+        o = [self._original_write(line)] + [s.write(line) for s in self._io_streams]
         return max(o)
 
     def flush(self):
+        self._original_flush()
+
         for s in self._io_streams:
             s.flush()
 
@@ -135,3 +123,13 @@ class _IOList(TextIOBase):
 
     def remove(self, stream):
         self._io_streams.remove(stream)
+
+    def __enter__(self):
+        self._original_stream.write = self.write
+        self._original_stream.flush = self.flush
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._original_stream.write = self._original_write
+        self._original_stream.flush = self._original_flush
+        self.close()
