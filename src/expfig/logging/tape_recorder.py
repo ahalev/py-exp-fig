@@ -97,7 +97,8 @@ class TapeRecorder(ContextDecorator):
         self.__exit__(None, None, None)
 
     def __del__(self):
-        self.__exit__(None, None, None)
+        if self._status >= TapeStatus.INITIALIZED:
+            self.__exit__(None, None, None)
 
     def __enter__(self, dest=None, copy_history=True):
         if self._status == TapeStatus.UNOPENED:
