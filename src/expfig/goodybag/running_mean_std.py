@@ -38,3 +38,7 @@ class RunningMeanStd:
         self.mean = new_mean
         self.var = new_var
         self.count = new_count
+
+    @property
+    def std(self):
+        return np.sqrt(self.var)
