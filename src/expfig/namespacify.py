@@ -12,7 +12,7 @@ from .core import depth, flatten
 from .logging import make_sequential_log_dir
 
 from expfig.utils.api import is_dict_like
-from expfig.utils.get_pandas import pandas as pd
+from expfig.utils.dependencies import pandas as pd
 
 
 yaml.SafeDumper.add_multi_representer(UserDict, yaml.SafeDumper.represent_dict)

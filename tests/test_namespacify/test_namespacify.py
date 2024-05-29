@@ -5,7 +5,7 @@ from copy import deepcopy
 from types import ModuleType
 
 from expfig.namespacify import Namespacify
-from expfig.utils.get_pandas import pandas as pd
+from expfig.utils.dependencies import pandas as pd
 
 np = pytest.importorskip('numpy')
 
