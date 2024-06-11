@@ -24,6 +24,15 @@ class TypeToNone:
     def __repr__(self):
         return f'TypeToNone({repr(self.type)})'
 
+    def __eq__(self, other):
+        if isinstance(self, type(other)) or isinstance(other, type(self)):
+            return self.type == other.type
+
+        return NotImplemented
+
+    def __hash__(self):
+        return hash(self.type)
+
     @property
     def valid_types(self):
         return self.type, type(None)

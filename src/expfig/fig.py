@@ -161,7 +161,7 @@ class Config(Namespacify):
 
     def _create_config_file_parser(self):
         parser = argparse.ArgumentParser()
-        parser.add_argument('--config', default=[], nargs='+', type=ListType(str), action=ListAction)
+        parser.add_argument('--config', default=[], nargs='+', type=ListType.from_type(str), action=ListAction)
         return parser
 
     def update_with_configs(self, configs, updatee=None):

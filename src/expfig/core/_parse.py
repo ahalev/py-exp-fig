@@ -26,6 +26,8 @@ def parse_arg_type(arg_name, base_default):
         _type = str2bool
     elif _type == str:
         _type = str2none
+    else:
+        _type = TypeToNone(_type)
 
     return _type, additional_args
 
@@ -35,7 +37,7 @@ class ListType:
     # TODO (ahalev) make this a metaclass, inherit from type and deprecate this class attr
 
     def __init__(self, _type):
-        self._type = TypeToNone(_type)
+        self._type = _type
 
     def __call__(self, value):
         if isinstance(value, list):
@@ -76,12 +78,12 @@ class ListType:
 
     @classmethod
     def from_list(cls, list_like, arg_name=None):
-        unique_types = {type(x) for x in list_like if x is not None}
+        unique_types = {parse_arg_type(None, x)[0] for x in list_like if x is not None}
 
         if len(unique_types) == 1:
             _type = unique_types.pop()
         else:
-            _type = str
+            _type = TypeToNone(str)
 
             if len(unique_types):
                 arg = f"'{arg_name}' " if arg_name else ""
@@ -89,6 +91,10 @@ class ListType:
                      "Collected values will be str.")
 
         return cls(_type)
+
+    @classmethod
+    def from_type(cls, _type):
+        return cls(TypeToNone(_type))
 
 
 class ListAction(argparse._StoreAction):
