@@ -1,8 +1,8 @@
 import functools
-
 import numpy as np
 import yaml
 
+from copy import copy as shallowcopy, deepcopy
 from contextlib import contextmanager
 from collections import UserDict
 from logging import getLogger
@@ -44,15 +44,36 @@ class Namespacify(UserDict):
     def depth(self):
         return depth(self)
 
-    def to_dict(self):
+    def to_dict(self, copy=False):
+        """
+        Parameters
+        ----------
+        copy: False, True, 'shallow', 'deep'
+            Whether to copy leaf values. If 'shallow' or True, performs shallow copies. If 'deep', performs deep copies.
+            If False, does not copy leaf values.
+
+        Returns
+        -------
+        d: dict
+
+        """
+        copy_funcs = {
+                False: lambda v: v,
+                True: shallowcopy,
+                'shallow': shallowcopy,
+                'deep': deepcopy
+            }
+
+        try:
+            copy_func = copy_funcs[copy]
+        except KeyError:
+            raise ValueError(f"Invalid copy value 'copy', must be one of {list(copy_funcs.keys())}")
+
         def _maybe_copy(value):
             if isinstance(value, Namespacify):
                 return value.to_dict()
 
-            try:
-                return value.copy()
-            except AttributeError:
-                return value
+            return copy_func(value)
 
         return {k: _maybe_copy(v) for k, v in self.items()}
 
