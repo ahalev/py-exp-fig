@@ -273,7 +273,7 @@ class Namespacify(UserDict):
         return self.difference(other)
 
     def __deepcopy__(self, memo=None):
-        return Namespacify(self.to_dict())
+        return Namespacify(self.to_dict('deep'))
 
 
 def equal(a, b):
