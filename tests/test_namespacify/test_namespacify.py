@@ -212,7 +212,7 @@ class TestNestNamespacify:
         assert d is not NESTED_CONTENTS
         assert d['jeep'] is not NESTED_CONTENTS['jeep']
 
-    @pytest.mark.parametrize('copy', [False, True, 'shallow', 'deep'])
+    @pytest.mark.parametrize('copy', (False, True, 'shallow', 'deep'))
     def test_to_dict_mutable_leaf(self, copy):
         contents = {**CONTENTS, 'features': ['alpha', 'beta', ['gamma', 'delta']]}
         ns = Namespacify(contents)
