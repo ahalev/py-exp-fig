@@ -32,11 +32,6 @@ class TestSimpleNamespacify:
         assert len(namespacify) == 0
         assert namespacify.to_dict() == {}
 
-    def test_nonempty_name(self):
-        namespacify = Namespacify({})
-        assert len(namespacify) == 0
-        assert namespacify.to_dict() == {}
-
     def test_simple_contents(self):
         namespacify = Namespacify(CONTENTS)
         assert len(namespacify) == 3
