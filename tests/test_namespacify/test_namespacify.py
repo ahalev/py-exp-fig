@@ -6,6 +6,7 @@ from types import ModuleType
 
 from expfig.namespacify import Namespacify
 from expfig.utils.dependencies import pandas as pd
+from tests.helpers.yaml_obj import InsuranceA
 
 np = pytest.importorskip('numpy')
 
@@ -210,6 +211,25 @@ class TestNestNamespacify:
         assert d == NESTED_CONTENTS
         assert d is not NESTED_CONTENTS
         assert d['jeep'] is not NESTED_CONTENTS['jeep']
+
+    @pytest.mark.parametrize('copy', [False, True, 'shallow', 'deep'])
+    def test_to_dict_mutable_leaf(self, copy):
+        contents = {**CONTENTS, 'features': ['alpha', 'beta', ['gamma', 'delta']]}
+        ns = Namespacify(contents)
+
+        d = ns.to_dict(copy=copy)
+
+        assert d == contents
+        assert d is not contents
+
+        if not copy:
+            assert d['features'] is contents['features']
+        elif copy in (True, 'shallow'):
+            assert d['features'] is not contents['features']
+            assert d['features'][2] is contents['features'][2]
+        else:
+            assert d['features'] is not contents['features']
+            assert d['features'][2] is not contents['features'][2]
 
     def test_to_dict_yaml(self):
         pass
