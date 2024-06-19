@@ -261,7 +261,7 @@ class Config(Namespacify):
         try:
             default = _type(default_val)
         except Exception as e:
-            msg = f"Value '{default_val}' read from yaml file cannot be case to type '{get_type(_type)}' "\
+            msg = f"Value '{default_val}' read from yaml file cannot be case to type '{_type.type}' "\
                   f"of base config value."
             if self.yaml_type_handling == 'error':
                 raise TypeError(msg) from e
