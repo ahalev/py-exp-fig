@@ -8,7 +8,7 @@ from expfig.core._parse_yaml_obj import YamlType
 from expfig.utils import api
 
 
-def parse_arg_type(base_default, arg_name):
+def parse_arg_type(base_default, arg_name=None):
     additional_args = {}
 
     if api.is_list_like(base_default):
