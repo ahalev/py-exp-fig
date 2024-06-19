@@ -95,6 +95,15 @@ class ListType:
     def from_type(cls, _type):
         return cls(TypeToNone(_type))
 
+    def __eq__(self, other):
+        if type(self) != type(other):
+            return NotImplemented
+
+        return self._type == other._type
+
+    def __hash__(self):
+        return hash(self._type)
+
 
 class ListAction(argparse._StoreAction):
     def __init__(self, *args, **kwargs):
