@@ -1,7 +1,7 @@
 import pytest
 
-from expfig.core._parse import ListType
-from expfig.core import str2none
+from expfig.core._parse import ListType, parse_arg_type
+from expfig.core import str2none, str2bool, TypeToNone
 
 
 class TestListTypeFromList:
@@ -30,3 +30,29 @@ class TestListTypeFromList:
             list_type = ListType.from_list(list_like)
 
         assert list_type.type == str
+
+
+class TestParseArgType:
+    def test_str(self):
+        parsed_type, _ = parse_arg_type('abc')
+        assert parsed_type == str2none
+
+    def test_bool(self):
+        parsed_type, _ = parse_arg_type(True)
+        assert parsed_type == str2bool
+
+    def test_int(self):
+        parsed_type, _ = parse_arg_type(1)
+        assert parsed_type == TypeToNone(int)
+
+    def test_float(self):
+        parsed_type, _ = parse_arg_type(1.0)
+        assert parsed_type == TypeToNone(float)
+
+    def test_list_of_int(self):
+        parsed_type, additional_args = parse_arg_type([1, 2, 3])
+        assert parsed_type == ListType(TypeToNone(int))
+
+    def test_list_of_str(self):
+        parsed_type, additional_args = parse_arg_type(list('abcd'))
+        assert parsed_type == ListType(str2none)
