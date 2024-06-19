@@ -38,5 +38,16 @@ class TypeToNone:
         return self.type, type(None)
 
 
-str2bool = TypeToNone(_str2bool)
+class _Str2Bool(TypeToNone):
+    def __init__(self):
+        super().__init__(bool)
+
+    def __call__(self, v):
+        if v in (None, 'None', 'null'):
+            return None
+
+        return _str2bool(v)
+
+
+str2bool = _Str2Bool()
 str2none = TypeToNone(str)
