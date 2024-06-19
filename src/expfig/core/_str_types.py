@@ -1,7 +1,7 @@
 import argparse
 
 
-def str2bool(v):
+def _str2bool(v):
     if isinstance(v, bool):
         return v
     if v.lower() in ('yes', 'true', 't', 'y', '1'):
@@ -38,4 +38,5 @@ class TypeToNone:
         return self.type, type(None)
 
 
+str2bool = TypeToNone(_str2bool)
 str2none = TypeToNone(str)
