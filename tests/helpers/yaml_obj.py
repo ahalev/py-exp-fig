@@ -25,6 +25,13 @@ class InsuranceB(yaml.YAMLObject):
         self.a = a
         self.b = b
 
+    def to_dict(self):
+        return {
+            'a': self.a,
+            'b': self.b,
+            'c': 'c'
+        }
+
     def __eq__(self, other):
         if type(self) != type(other):
             return NotImplemented
