@@ -14,20 +14,19 @@ def parse_arg_type(arg_name, base_default):
     if api.is_list_like(base_default):
         additional_args.update(nargs='+', action=ListAction)
         _type = ListType.from_list(base_default, arg_name)
-
     elif getattr(base_default, 'yaml_tag', None) is not None:  # is a Yaml object
         _type = YamlType(yaml_default=True)
-    elif base_default is None or base_default == '': # allow empty strings to be yaml-objects but no failure if not
+    elif base_default is None or base_default == '':  # allow empty strings to be yaml-objects but no failure if not
         _type = YamlType(yaml_default=False)
     else:
-        _type = type(base_default)
+        base_type = type(base_default)
 
-    if _type == bool:
-        _type = str2bool
-    elif _type == str:
-        _type = str2none
-    else:
-        _type = TypeToNone(_type)
+        if base_type == bool:
+            _type = str2bool
+        elif base_type == str:
+            _type = str2none
+        else:
+            _type = TypeToNone(base_type)
 
     return _type, additional_args
 
