@@ -8,7 +8,7 @@ from expfig.core._parse_yaml_obj import YamlType
 from expfig.utils import api
 
 
-def parse_arg_type(arg_name, base_default):
+def parse_arg_type(base_default, arg_name):
     additional_args = {}
 
     if api.is_list_like(base_default):
@@ -77,7 +77,7 @@ class ListType:
 
     @classmethod
     def from_list(cls, list_like, arg_name=None):
-        unique_types = {parse_arg_type(None, x)[0] for x in list_like if x is not None}
+        unique_types = {parse_arg_type(x, None)[0] for x in list_like if x is not None}
 
         if len(unique_types) == 1:
             _type = unique_types.pop()

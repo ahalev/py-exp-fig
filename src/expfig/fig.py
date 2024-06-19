@@ -254,7 +254,7 @@ class Config(Namespacify):
     def _collect_argument(self, default_val, base_default, arg_name):
         arg = {}
 
-        _type, additional_args = parse_arg_type(arg_name, base_default)
+        _type, additional_args = parse_arg_type(base_default, arg_name)
 
         arg.update(additional_args)
 
