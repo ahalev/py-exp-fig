@@ -45,8 +45,16 @@ class Namespacify(UserDict):
         return depth(self)
 
     def to_dict(self):
-        return {k: v.to_dict() if isinstance(v, Namespacify) else (v.copy() if hasattr(v, 'copy') else v)
-                for k, v in self.items()}
+        def _maybe_copy(value):
+            if isinstance(value, Namespacify):
+                return value.to_dict()
+
+            try:
+                return value.copy()
+            except AttributeError:
+                return value
+
+        return {k: _maybe_copy(v) for k, v in self.items()}
 
     def to_series(self):
         series = pd.json_normalize(self.to_dict()).squeeze()
