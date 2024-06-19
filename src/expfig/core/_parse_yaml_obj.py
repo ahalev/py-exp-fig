@@ -34,6 +34,13 @@ class YamlType:
     def type(self):
         return type(self)
 
+    @property
+    def valid_types(self):
+        if self.yaml_default:
+            return yaml.YAMLObject,
+
+        return yaml.YAMLObject, str, type(None)
+
 
 def is_yaml_obj(value):
     return getattr(value, 'yaml_tag', None) is not None
