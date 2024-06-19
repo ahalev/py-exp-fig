@@ -30,6 +30,10 @@ class YamlType:
 
         return str2none(value)
 
+    @property
+    def type(self):
+        return type(self)
+
 
 def is_yaml_obj(value):
     return getattr(value, 'yaml_tag', None) is not None
