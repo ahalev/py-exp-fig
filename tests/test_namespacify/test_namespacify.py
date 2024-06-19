@@ -204,6 +204,16 @@ class TestNestNamespacify:
         ns = Namespacify(dict())
         assert ns.to_series().empty
 
+    def test_to_dict(self):
+        ns = Namespacify(NESTED_CONTENTS)
+        d = ns.to_dict()
+        assert d == NESTED_CONTENTS
+        assert d is not NESTED_CONTENTS
+        assert d['jeep'] is not NESTED_CONTENTS['jeep']
+
+    def test_to_dict_yaml(self):
+        pass
+
     def test_setitem_tuple(self):
         ns = Namespacify(NESTED_CONTENTS)
         ns[('truck', 'axles')] = 32
