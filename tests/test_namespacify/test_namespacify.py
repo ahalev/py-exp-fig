@@ -6,7 +6,7 @@ from types import ModuleType
 
 from expfig.namespacify import Namespacify
 from expfig.utils.dependencies import pandas as pd
-from tests.helpers.yaml_obj import InsuranceA
+from tests.helpers.yaml_obj import InsuranceA, InsuranceB
 
 np = pytest.importorskip('numpy')
 
@@ -231,8 +231,37 @@ class TestNestNamespacify:
             assert d['features'] is not contents['features']
             assert d['features'][2] is not contents['features'][2]
 
-    def test_to_dict_yaml(self):
-        pass
+    @pytest.mark.parametrize('dump_yaml', (True, False))
+    @pytest.mark.parametrize('insurance_val', (-1, 10.0, 'a', False, None))
+    def test_to_dict_yaml_no_to_dict(self, dump_yaml, insurance_val):
+        contents = {**CONTENTS, 'insurance': InsuranceA(value=insurance_val)}
+        ns = Namespacify(contents)
+
+        d = ns.to_dict(dump_yaml=dump_yaml)
+
+        assert d is not contents
+
+        if dump_yaml:
+            assert d['insurance'] == {'!InsuranceA': {'value': insurance_val}}
+        else:
+            assert d == contents
+            assert d['insurance'] is contents['insurance']
+
+    @pytest.mark.parametrize('dump_yaml', (True, False))
+    @pytest.mark.parametrize('insurance_val', (-1, 10.0, 'a', False, None))
+    def test_to_dict_yaml_has_to_dict(self, dump_yaml, insurance_val):
+        contents = {**CONTENTS, 'insurance': InsuranceB(b=insurance_val)}
+        ns = Namespacify(contents)
+
+        d = ns.to_dict(dump_yaml=dump_yaml)
+
+        assert d is not contents
+
+        if dump_yaml:
+            assert d['insurance'] == {'!InsuranceB': {'a': None, 'b': insurance_val, 'c': 'c'}}
+        else:
+            assert d == contents
+            assert d['insurance'] is contents['insurance']
 
     def test_setitem_tuple(self):
         ns = Namespacify(NESTED_CONTENTS)
