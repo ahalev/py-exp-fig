@@ -3,7 +3,7 @@ import argparse
 from ast import literal_eval
 from warnings import warn
 
-from expfig.core import str2bool, str2none, TypeToNone
+from expfig.core import str2bool, str2none, none2any, TypeToNone
 from expfig.core._parse_yaml_obj import YamlType
 from expfig.utils import api
 
@@ -82,17 +82,19 @@ class ListType:
         if len(unique_types) == 1:
             _type = unique_types.pop()
         else:
-            _type = TypeToNone(str)
+            _type = none2any
 
             if len(unique_types):
                 arg = f"'{arg_name}' " if arg_name else ""
                 warn(f"Collecting list-like argument {arg}with non-unique types {unique_types} in default value "
-                     "Collected values will be str.")
+                     "Collected values may be str.")
 
         return cls(_type)
 
     @classmethod
     def from_type(cls, _type):
+        if _type is None:
+            return cls(none2any)
         return cls(TypeToNone(_type))
 
     def __eq__(self, other):
