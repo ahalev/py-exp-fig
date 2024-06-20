@@ -78,26 +78,10 @@ class Namespacify(UserDict):
         def _maybe_copy(value):
             if isinstance(value, Namespacify):
                 return value.to_dict()
-            if dump_yaml:
-                value = _maybe_get_yaml_contents(value)
+            if dump_yaml and hasattr(value, 'yaml_tag'):
+                    value = yaml.safe_dump(value, default_flow_style=True).rstrip()
 
             return copy_func(value)
-
-        def _maybe_get_yaml_contents(value):
-            try:
-                yaml_tag = value.yaml_tag
-            except AttributeError:
-                return value
-
-            try:
-                contents = value.to_dict()
-            except AttributeError:
-                if hasattr(value, '__getstate__'):
-                    contents = value.__getstate__()
-                else:
-                    contents = value.__dict__
-
-            return {yaml_tag: contents}
 
         return {k: _maybe_copy(v) for k, v in self.items()}
 
