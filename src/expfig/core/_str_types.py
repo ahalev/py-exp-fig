@@ -54,7 +54,7 @@ class _None2Any(TypeToNone):
             v = v.replace('null', 'None')
             try:
                 return literal_eval(v)
-            except ValueError:
+            except (ValueError, SyntaxError):
                 pass
 
         return v
