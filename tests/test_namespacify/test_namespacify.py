@@ -228,8 +228,9 @@ class TestNestNamespacify:
 
     @pytest.mark.parametrize('dump_yaml', (True, False))
     @pytest.mark.parametrize('insurance_val', (-1, 10.0, 'a', False, None))
-    def test_to_dict_yaml_no_to_dict(self, dump_yaml, insurance_val):
-        contents = {**CONTENTS, 'insurance': InsuranceA(value=insurance_val)}
+    def test_to_dict_yaml(self, dump_yaml, insurance_val):
+        insurance = InsuranceB(b=insurance_val)
+        contents = {**CONTENTS, 'insurance': insurance}
         ns = Namespacify(contents)
 
         d = ns.to_dict(dump_yaml=dump_yaml)
@@ -237,23 +238,8 @@ class TestNestNamespacify:
         assert d is not contents
 
         if dump_yaml:
-            assert d['insurance'] == {'!InsuranceA': {'value': insurance_val}}
-        else:
-            assert d == contents
-            assert d['insurance'] is contents['insurance']
-
-    @pytest.mark.parametrize('dump_yaml', (True, False))
-    @pytest.mark.parametrize('insurance_val', (-1, 10.0, 'a', False, None))
-    def test_to_dict_yaml_has_to_dict(self, dump_yaml, insurance_val):
-        contents = {**CONTENTS, 'insurance': InsuranceB(b=insurance_val)}
-        ns = Namespacify(contents)
-
-        d = ns.to_dict(dump_yaml=dump_yaml)
-
-        assert d is not contents
-
-        if dump_yaml:
-            assert d['insurance'] == {'!InsuranceB': {'a': None, 'b': insurance_val, 'c': 'c'}}
+            assert d['insurance'] == yaml.safe_dump(insurance, default_flow_style=True).rstrip()
+            assert yaml.safe_load(d['insurance']) == insurance
         else:
             assert d == contents
             assert d['insurance'] is contents['insurance']
