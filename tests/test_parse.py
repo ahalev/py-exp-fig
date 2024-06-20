@@ -29,7 +29,25 @@ class TestListTypeFromList:
         with pytest.warns(UserWarning, match='Collecting list-like argument'):
             list_type = ListType.from_list(list_like)
 
-        assert list_type.type == str
+        assert list_type.type == 'any'
+
+    @pytest.mark.parametrize('value', ('a', 1, ['a', 1], ['a', 1, ['a', 1]]))
+    def test_nonunique_parse(self, value):
+        list_like = 'a', 0
+
+        with pytest.warns(UserWarning, match='Collecting list-like argument'):
+            list_type = ListType.from_list(list_like)
+
+        parsed = list_type(str(value))
+
+        assert parsed == value
+
+    @pytest.mark.parametrize('value', ('a', 1, ['a', 1], ['a', 1, ['a', 1]]))
+    def test_none_parse(self, value):
+        list_type = ListType.from_list([None])
+        parsed = list_type(str(value))
+
+        assert parsed == value
 
 
 class TestParseArgType:
