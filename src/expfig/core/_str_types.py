@@ -1,5 +1,6 @@
 import argparse
 
+from ast import literal_eval
 
 def _str2bool(v):
     if isinstance(v, bool):
@@ -38,6 +39,31 @@ class TypeToNone:
         return self.type, type(None)
 
 
+class _None2Any(TypeToNone):
+    def __init__(self):
+        super().__init__('any')
+
+    def __call__(self, v):
+        return self.any_item(v)
+
+    @staticmethod
+    def any_item(v):
+        if v in (None, 'None', 'null'):
+            return None
+        elif isinstance(v, str):
+            v = v.replace('null', 'None')
+            try:
+                return literal_eval(v)
+            except ValueError:
+                pass
+
+        return v
+
+    @property
+    def valid_types(self):
+        return str, int, float, list, dict, set, bool, tuple, type(None)
+
+
 class _Str2Bool(TypeToNone):
     def __init__(self):
         super().__init__(bool)
@@ -49,5 +75,6 @@ class _Str2Bool(TypeToNone):
         return _str2bool(v)
 
 
+none2any = _None2Any()
 str2bool = _Str2Bool()
 str2none = TypeToNone(str)
