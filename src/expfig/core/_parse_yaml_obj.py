@@ -2,7 +2,7 @@ import yaml
 
 from functools import reduce
 
-from expfig.core._str_types import str2none
+from expfig.core._str_types import str2none, none2any
 
 
 CMD_LINE_YAML_REPLACEMENTS = [('{', ' {'), (':', ': ')]
@@ -28,7 +28,7 @@ class YamlType:
         elif self.yaml_default:
             raise yaml.constructor.ConstructorError(f"value '{value}' does not begin with a yaml tag (!).")
 
-        return str2none(value)
+        return none2any(value)
 
     @property
     def type(self):
