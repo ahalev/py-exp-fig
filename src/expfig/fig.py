@@ -10,7 +10,7 @@ from pathlib import Path
 from warnings import warn
 
 from . import Namespacify, nested_dict_update
-from .core import unflatten, get_similar_args_str_fmt
+from .core import flatten, unflatten, get_similar_args_str_fmt
 from .core._parse import ListType, ListAction, parse_arg_type, get_type
 from .logging import get_logger
 from .utils import api
@@ -48,7 +48,7 @@ class Config(Namespacify):
     ----------
 
     """
-    def __init__(self, config=None, default=DEFAULT_CONFIG_PATH, yaml_type_handling='warn'):
+    def __init__(self, config=None, default=DEFAULT_CONFIG_PATH, track_sources=True, yaml_type_handling='warn'):
         assert yaml_type_handling in ('ignore', 'warn', 'error'), \
             "yaml_type_handling must be one of 'ignore', 'warn', error'"
 
@@ -58,10 +58,14 @@ class Config(Namespacify):
         self.logger = get_logger()
         self.verbosity = 0
 
+        self._source_def = SourceTracker(track_sources)
+
         super().__init__(self._parse_config())
 
         self.update_with_configs(config)
         self.verbose(self.verbosity)
+
+        self.sources, self.all_sources = self._source_def.flush()
 
     def _parse_default(self, config, default):
         if api.is_dict_like(default):
@@ -85,12 +89,15 @@ class Config(Namespacify):
         # First we parse any --config arguments and load those
         # Then we can override them with any other passed values.
         base_config = deepcopy(self.default_config)
+        self._source_def.add_from_source(base_config, 'DEFAULT')
 
         config_file_args, other_args = self._split_config_file_args()
         config_files = self._create_config_file_parser().parse_args(args=config_file_args)
         self.update_with_configs(config_files.config, base_config)
 
-        parsed_args = self._create_parser(default=base_config).parse_known_args(args=other_args)
+        parser = self._create_parser(default=base_config)
+        parsed_args = parser.parse_known_args(args=other_args)
+        self._source_def.add_from_argparse(parser, other_args)
 
         if len(parsed_args[1]):
             valid_option_keys = sorted(parsed_args[0].__dict__.keys())
@@ -190,14 +197,18 @@ class Config(Namespacify):
         elif not api.is_list_like(configs) or api.is_dict_like(configs):
             configs = [configs]
 
-        for config in configs:
-            updatee = self._update_with_config(config, updatee=updatee)
+        for j, config in enumerate(configs):
+            updatee = self._update_with_config(config, updatee=updatee, num=j)
 
         return updatee
 
-    def _update_with_config(self, config, updatee=None):
+    def _update_with_config(self, config, updatee=None, num=None):
         if isinstance(config, (str, Path)):
-            config = _config_from_yaml(config)
+            loaded_config = _config_from_yaml(config)
+            self._source_def.add_from_source(loaded_config, config)
+            config = loaded_config
+        else:
+            self._source_def.add_from_source(config, f'CONFIG-SDK', num)
 
         config = self._restructure_as_necessary(config)
 
@@ -339,6 +350,53 @@ class DefaultConfig(Namespacify):
             default = _config_from_yaml(default)
 
         super().__init__(default)
+
+
+class SourceTracker:
+    def __init__(self, track=True):
+        self.track = track
+        self._sources = dict()
+        self._all_sources = set()
+
+    def add_from_source(self, updated_in_source, source, source_num=None):
+        if not self.track:
+            return
+
+        if source_num is not None:
+            source += f'-{source_num}'
+
+        if source in self._all_sources:
+            raise ValueError(f"Duplicate source '{source}'")
+
+        from_source = dict.fromkeys(flatten(updated_in_source).keys(), source)
+        self._sources.update(from_source)
+        self._all_sources.add(source)
+
+    def add_from_argparse(self, parser, args):
+        if not self.track:
+            return
+
+        for action in parser._actions:
+            action.type = None
+            action.default = argparse.SUPPRESS
+
+        parsed = parser.parse_known_args(args)
+        passed_args = parsed[0].__dict__
+
+        if passed_args:
+            self.add_from_source(passed_args, 'ARGV')
+
+    def flush(self):
+        if not self.track:
+            return None, set()
+
+        sources = Namespacify(unflatten(self._sources))
+        all_sources = self._all_sources.copy()
+
+        self._sources.clear()
+        self._all_sources.clear()
+
+        return sources, all_sources
 
 
 def _config_from_yaml(file_path):
