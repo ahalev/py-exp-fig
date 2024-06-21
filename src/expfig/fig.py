@@ -197,18 +197,18 @@ class Config(Namespacify):
         elif not api.is_list_like(configs) or api.is_dict_like(configs):
             configs = [configs]
 
-        for j, config in enumerate(configs):
-            updatee = self._update_with_config(config, updatee=updatee, num=j)
+        for config in configs:
+            updatee = self._update_with_config(config, updatee=updatee)
 
         return updatee
 
-    def _update_with_config(self, config, updatee=None, num=None):
+    def _update_with_config(self, config, updatee=None):
         if isinstance(config, (str, Path)):
             loaded_config = _config_from_yaml(config)
             self._source_def.add_from_source(loaded_config, config)
             config = loaded_config
         else:
-            self._source_def.add_from_source(config, f'CONFIG-SDK', num)
+            self._source_def.add_from_source(config, f'CONFIG-SDK')
 
         config = self._restructure_as_necessary(config)
 
@@ -358,12 +358,9 @@ class SourceTracker:
         self._sources = dict()
         self._all_sources = set()
 
-    def add_from_source(self, updated_in_source, source, source_num=None):
+    def add_from_source(self, updated_in_source, source):
         if not self.track:
             return
-
-        if source_num is not None:
-            source += f'-{source_num}'
 
         if source in self._all_sources:
             raise ValueError(f"Duplicate source '{source}'")
