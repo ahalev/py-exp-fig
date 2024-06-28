@@ -9,28 +9,28 @@ except ImportError:
     plt = None
 
 
-def save_fig(fname, *args, show=False, tracker_file=None, **kwargs):
+def track_savefig(fname, *args, show=False, tracker_file=None, **kwargs):
     if plt is None:
         raise ImportError("matplotlib must be installed to use 'savefig'")
 
     plt.savefig(fname, *args, **kwargs)
-    save_to(fname, tracker_file)
+    track_save_to(fname, tracker_file)
 
     if show:
         plt.show()
 
 
-def save_table(table, fname, print_out=False, tracker_file=None):
+def track_savetable(table, fname, print_out=False, tracker_file=None):
     with open(fname, 'w') as f:
         f.write(table)
 
-    save_to(fname, tracker_file)
+    track_save_to(fname, tracker_file)
 
     if print_out:
         print(table)
 
 
-def save_to(fname, tracker_file=None):
+def track_save_to(fname, tracker_file=None):
     save_script_result(sys.argv[0], fname, tracker_file)
     return fname
 
