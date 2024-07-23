@@ -73,6 +73,15 @@ class TestFlatten:
         expected_contents = {'jeep.car': 'vroom'}
         assert unnested == expected_contents
 
+    def test_single_key_with_int(self):
+        nested = {'jeep': {0: 'vroom'}}
+
+        with pytest.warns(UserWarning):
+            unnested = flatten(nested)
+
+        expected_contents = {'jeep.0': 'vroom'}
+        assert unnested == expected_contents
+
     def test_single_key_namespacify(self):
         from expfig import Namespacify
         nested = Namespacify({'jeep': {'car': 'vroom'}})
