@@ -1,4 +1,5 @@
 from collections import UserDict
+from warnings import warn
 
 from expfig.utils import api
 
@@ -28,7 +29,15 @@ def flatten(nested, delimiter='.', levels=None, *, _key_stack=()):
         ):
             flat.update(flatten(v, delimiter, levels=levels, _key_stack=[*_key_stack, k]))
         else:
-            flat_key = delimiter.join([*_key_stack, k])
+            try:
+                flat_key = delimiter.join([*_key_stack, k])
+            except TypeError:
+                flat_key = delimiter.join([*_key_stack, str(k)])
+                warn(
+                    f"Flattening key ({k}) of type ({k.__class__.__name__}) at location '{flat_key}', "
+                    f"will be cast to str."
+                )
+
             flat[flat_key] = v
 
     return flat
