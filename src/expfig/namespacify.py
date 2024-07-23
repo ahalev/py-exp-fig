@@ -225,7 +225,12 @@ class Namespacify(UserDict):
         return sorted(rv)
 
     def __getitem__(self, item):
-        if item[0] == slice(None) or isinstance(item[0], list):
+        try:
+            is_adv_slice = item[0] == slice(None) or isinstance(item[0], list)
+        except TypeError:
+            return super().__getitem__(item)
+
+        if is_adv_slice:
             keys = self.keys() if item[0] == slice(None) else item[0]
             return {k: self[k][item[1:]] for k in keys}
 
