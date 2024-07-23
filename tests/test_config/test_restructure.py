@@ -9,7 +9,7 @@ CONTENTS = {
 }
 
 
-class TestNest:
+class TestUnflatten:
     def test_no_nest(self):
         restructured = unflatten(CONTENTS)
 
@@ -66,7 +66,7 @@ class TestNest:
         assert restructured == expected
 
 
-class TestUnnest:
+class TestFlatten:
     def test_single_key(self):
         nested = {'jeep': {'car': 'vroom'}}
         unnested = flatten(nested)
