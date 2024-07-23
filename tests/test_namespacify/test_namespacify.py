@@ -270,6 +270,56 @@ class TestNestNamespacify:
 
         assert isinstance(ns['bike'], Namespacify)
 
+    def test_getitem(self):
+        ns = Namespacify(CONTENTS)
+        assert ns['car'] == 'vroom'
+
+    def test_bad_getitem(self):
+        ns = Namespacify(CONTENTS)
+
+        with pytest.raises(KeyError):
+            _ = ns['car-typo']
+
+    def test_getitem_int_key(self):
+        contents = {
+            **CONTENTS,
+            0: 'zero'
+        }
+        ns = Namespacify(contents)
+
+        assert ns[0] == 'zero'
+
+    def test_getitem_bad_int_key(self):
+        contents = {
+            **CONTENTS,
+            0: 'zero'
+        }
+        ns = Namespacify(contents)
+
+        with pytest.raises(KeyError):
+            _ = ns[1]
+
+    def test_getitem_float_key(self):
+        contents = {
+            **CONTENTS,
+            0.5: 'half'
+        }
+
+        ns = Namespacify(contents)
+
+        assert ns[0.5] == 'half'
+
+    def test_getitem_bad_float_key(self):
+        contents = {
+            **CONTENTS,
+            0.5: 'half'
+        }
+
+        ns = Namespacify(contents)
+
+        with pytest.raises(KeyError):
+            _ = ns[1.5]
+
 
 class TestSymmetricDifference:
     def test_empty(self):
