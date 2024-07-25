@@ -69,7 +69,7 @@ class Config(Namespacify):
 
     def _parse_default(self, config, default):
         if api.is_dict_like(default):
-            return default
+            return unflatten(default)
 
         candidates = [Path(default), (Path(sys.argv[0]).parent / default)]
 
