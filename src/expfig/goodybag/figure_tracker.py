@@ -15,7 +15,7 @@ def track_savefig(fname, *args, show=False, tracker_file=None, **kwargs):
 
     plt.savefig(fname, *args, **kwargs)
 
-    track_save_to(script, fname)
+    track_save_to(fname, tracker_file=tracker_file)
 
     if show:
         plt.show()
@@ -25,7 +25,7 @@ def track_savetable(table, fname, print_out=False, tracker_file=None):
     with open(fname, 'w') as f:
         f.write(table)
 
-    track_save_to(script, fname)
+    track_save_to(fname, tracker_file=tracker_file)
 
     if print_out:
         print(table)
