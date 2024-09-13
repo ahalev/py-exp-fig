@@ -222,7 +222,7 @@ There are three other ways to define custom settings/hyperparameters:
      
      config = Config(config='path_to_a_config.yaml')
      ```
-  3. You can pass a nested dictionary defining configuration settings to `expfig.Config`.
+  3. You can pass a nested or period-deliminated dictionary defining configuration settings to `expfig.Config`.
      For example:
      ```python
      from expfig import Config
@@ -234,6 +234,19 @@ There are three other ways to define custom settings/hyperparameters:
      }
      config = Config(config_dict)
      ```
+     or
+     ```python
+     from expfig import Config
+     
+     config_dict = {
+         'microgrid.config.scenario': 1,
+         'algo.sampler.type': 'local',
+         'algo.sampler.n_workers': 4,
+         'context.verbose': True
+     }
+     config = Config(config_dict)
+     ```
+     Both of the above methods result is identical `Config`s.
 
 ## Hyperparameter Resolution Order
 
